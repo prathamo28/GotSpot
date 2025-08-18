@@ -343,6 +343,39 @@
   font-size: 14px;
 }
 
+/* Filter Tabs */
+.filter-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+}
+
+.filter-tab {
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  color: #6b7280;
+  padding: 8px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.filter-tab:hover {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.filter-tab.active {
+  background: #2563eb;
+  color: white;
+  border-color: #2563eb;
+}
+
 /* Spot Cards */
 .spots-list {
   display: flex;
@@ -400,13 +433,23 @@
   gap: 8px;
   font-size: 14px;
   margin-top: 4px;
+  flex-wrap: wrap;
 }
 
-.spot-meta span:first-child {
+.spot-type {
+  background: #dbeafe;
+  color: #1e40af;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.spot-meta span:not(.spot-type):first-of-type {
   color: #f59e0b;
 }
 
-.spot-meta span:last-child {
+.spot-meta span:not(.spot-type):last-of-type {
   color: #9ca3af;
 }
 
@@ -422,6 +465,24 @@
 .availability-total {
   font-size: 12px;
   color: #9ca3af;
+}
+
+/* Spot Features */
+.spot-features {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.feature-tag {
+  background: #f3f4f6;
+  color: #374151;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 500;
+  border: 1px solid #e5e7eb;
 }
 
 .spot-details {
@@ -494,7 +555,36 @@
 
 .empty-state p {
   color: #6b7280;
-  margin: 0;
+  margin: 0 0 24px 0;
+}
+
+/* Statistics Grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.stat-item {
+  text-align: center;
+  padding: 16px;
+  background: #f9fafb;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+.stat-number {
+  font-size: 24px;
+  font-weight: bold;
+  color: #2563eb;
+  margin-bottom: 4px;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: #6b7280;
+  font-weight: 500;
 }
 
 /* Mobile optimizations */
@@ -514,5 +604,19 @@
   
   .results-section {
     padding: 0 16px 16px;
+  }
+  
+  .filter-tabs {
+    gap: 6px;
+  }
+  
+  .filter-tab {
+    padding: 6px 10px;
+    font-size: 11px;
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
   }
 }
