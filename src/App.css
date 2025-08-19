@@ -419,8 +419,37 @@
   position: relative;
 }
 
-.map {
+.custom-map {
   border-radius: 12px;
+  overflow: hidden;
+  background: white;
+}
+
+.map-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.parking-spot {
+  transition: all 0.2s ease;
+}
+
+.parking-spot:hover {
+  transform: scale(1.1);
+}
+
+.map-instructions {
+  background: #f9fafb;
+  border-top: 1px solid #e5e7eb;
+  padding: 12px;
+  text-align: center;
+}
+
+.map-instructions p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 12px;
 }
 
 .map-controls {
