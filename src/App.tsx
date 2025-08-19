@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
+import Map from './components/Map';
+import Payment from './components/Payment';
 
 // Enhanced parking spot interface
 interface ParkingSpot {
@@ -32,11 +34,32 @@ const App: React.FC = () => {
   const [showResults, setShowResults] = useState(false);
   const [loading, setLoading] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState('all');
+  const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
+  const [selectedSpot, setSelectedSpot] = useState<number | null>(null);
+  const [showPayment, setShowPayment] = useState(false);
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [reservations, setReservations] = useState<string[]>([]);
 
   useEffect(() => {
     const savedAuth = sessionStorage.getItem('gotspot_demo_auth');
     if (savedAuth === 'true') {
       setIsAuthenticated(true);
+    }
+    
+    // Get user location
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserLocation({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          });
+        },
+        (error) => {
+          console.log('Location access denied, using default Gdansk location');
+          setUserLocation({ lat: 54.3520, lng: 18.6466 });
+        }
+      );
     }
   }, []);
 
@@ -255,6 +278,25 @@ const App: React.FC = () => {
     return labels[type] || type;
   };
 
+  const handleSpotSelect = (spotId: number) => {
+    setSelectedSpot(spotId);
+    if (viewMode === 'list') {
+      setViewMode('map');
+    }
+  };
+
+  const handleReserveSpot = (spotId: number) => {
+    setSelectedSpot(spotId);
+    setShowPayment(true);
+  };
+
+  const handlePaymentComplete = (reservationId: string) => {
+    setReservations((prev: string[]) => [...prev, reservationId]);
+    setShowPayment(false);
+    setSelectedSpot(null);
+    // In real app, update parking spot availability
+  };
+
   // Login Screen
   if (!isAuthenticated) {
     return (
@@ -293,9 +335,9 @@ const App: React.FC = () => {
             <h3>🚀 Demo Features:</h3>
             <ul>
               <li>• 8 real Gdansk parking locations</li>
-              <li>• Real-time availability simulation</li>
-              <li>• Smart destination search</li>
-              <li>• Distance calculation & sorting</li>
+              <li>• Interactive map with real-time updates</li>
+              <li>• Smart destination search & navigation</li>
+              <li>• In-app payment & reservation system</li>
               <li>• Professional investor-ready demo</li>
             </ul>
           </div>
@@ -398,6 +440,22 @@ const App: React.FC = () => {
             <span className="results-count">{getFilteredSpots().length} spots found</span>
           </div>
 
+          {/* View Mode Toggle */}
+          <div className="view-toggle">
+            <button
+              className={`view-btn ${viewMode === 'list' ? 'active' : ''}`}
+              onClick={() => setViewMode('list')}
+            >
+              📋 List View
+            </button>
+            <button
+              className={`view-btn ${viewMode === 'map' ? 'active' : ''}`}
+              onClick={() => setViewMode('map')}
+            >
+              🗺️ Map View
+            </button>
+          </div>
+
           {/* Filter Tabs */}
           <div className="filter-tabs">
             <button
@@ -425,54 +483,80 @@ const App: React.FC = () => {
               Street ({nearbySpots.filter((s: ParkingSpot) => s.type === 'street').length})
             </button>
           </div>
+
+          {/* Map View */}
+          {viewMode === 'map' && (
+            <div className="map-view">
+              <Map
+                parkingSpots={getFilteredSpots()}
+                selectedSpot={selectedSpot}
+                onSpotSelect={handleSpotSelect}
+                userLocation={userLocation}
+              />
+            </div>
+          )}
           
-          <div className="spots-list">
-            {getFilteredSpots().map(spot => (
-              <div key={spot.id} className="spot-card">
-                <div className="spot-header">
-                  <div className="spot-info">
-                    <span className="spot-icon">{getSpotIcon(spot.type)}</span>
-                    <div>
-                      <h3>{spot.name}</h3>
-                      <p className="spot-address">{spot.address}</p>
-                      <div className="spot-meta">
-                        <span className="spot-type">{getTypeLabel(spot.type)}</span>
-                        <span>★ {spot.rating}</span>
-                        <span>• {spot.lastUpdated}</span>
-                        {spot.distance && (
-                          <span>• {spot.distance.toFixed(1)} km</span>
-                        )}
+          {/* List View */}
+          {viewMode === 'list' && (
+            <div className="spots-list">
+              {getFilteredSpots().map(spot => (
+                <div key={spot.id} className="spot-card">
+                  <div className="spot-header">
+                    <div className="spot-info">
+                      <span className="spot-icon">{getSpotIcon(spot.type)}</span>
+                      <div>
+                        <h3>{spot.name}</h3>
+                        <p className="spot-address">{spot.address}</p>
+                        <div className="spot-meta">
+                          <span className="spot-type">{getTypeLabel(spot.type)}</span>
+                          <span>★ {spot.rating}</span>
+                          <span>• {spot.lastUpdated}</span>
+                          {spot.distance && (
+                            <span>• {spot.distance.toFixed(1)} km</span>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  <div className="availability">
-                    <div 
-                      className="availability-number"
-                      style={{ color: getAvailabilityColor(spot.available) }}
-                    >
-                      {spot.available}
+                    <div className="availability">
+                      <div 
+                        className="availability-number"
+                        style={{ color: getAvailabilityColor(spot.available) }}
+                      >
+                        {spot.available}
+                      </div>
+                      <div className="availability-total">of {spot.total}</div>
                     </div>
-                    <div className="availability-total">of {spot.total}</div>
+                  </div>
+                  
+                  {/* Features */}
+                  <div className="spot-features">
+                    {spot.features.map((feature, index) => (
+                      <span key={index} className="feature-tag">{feature}</span>
+                    ))}
+                  </div>
+                  
+                  <div className="spot-details">
+                    <div className="spot-price">💰 {spot.price}</div>
+                    <div className="spot-actions">
+                      <button 
+                        className="navigate-button"
+                        onClick={() => handleSpotSelect(spot.id)}
+                      >
+                        🗺️ View on Map
+                      </button>
+                      <button 
+                        className="reserve-button"
+                        onClick={() => handleReserveSpot(spot.id)}
+                        disabled={spot.available === 0}
+                      >
+                        💳 Reserve & Pay
+                      </button>
+                    </div>
                   </div>
                 </div>
-                
-                {/* Features */}
-                <div className="spot-features">
-                  {spot.features.map((feature, index) => (
-                    <span key={index} className="feature-tag">{feature}</span>
-                  ))}
-                </div>
-                
-                <div className="spot-details">
-                  <div className="spot-price">💰 {spot.price}</div>
-                  <div className="spot-actions">
-                    <button className="navigate-button">Navigate (Demo)</button>
-                    <button className="reserve-button">Reserve (Demo)</button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
@@ -481,7 +565,7 @@ const App: React.FC = () => {
         <div className="empty-state">
           <div className="empty-icon">🎯</div>
           <h3>Find Smart Parking in Gdansk</h3>
-          <p>Real-time availability • Best prices • Easy navigation</p>
+          <p>Real-time availability • Interactive maps • Easy payments</p>
           <div className="stats-grid">
             <div className="stat-item">
               <div className="stat-number">8</div>
@@ -496,6 +580,24 @@ const App: React.FC = () => {
               <div className="stat-label">Updates</div>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Payment Modal */}
+      {showPayment && selectedSpot && (
+        <div className="modal-overlay">
+          <Payment
+            parkingSpot={allParkingSpots.find(s => s.id === selectedSpot)!}
+            onPaymentComplete={handlePaymentComplete}
+            onCancel={() => setShowPayment(false)}
+          />
+        </div>
+      )}
+
+      {/* Reservations */}
+      {reservations.length > 0 && (
+        <div className="reservations-banner">
+          <p>🎉 You have {reservations.length} active reservation(s)</p>
         </div>
       )}
     </div>
