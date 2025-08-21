@@ -230,6 +230,28 @@ const Map: React.FC<MapProps> = ({
     }
   };
 
+  const getMarkerIcon = (type: string) => {
+    // Return a simple colored circle for markers
+    const colors: { [key: string]: string } = {
+      'mall': '#FF6B6B',
+      'office': '#4ECDC4',
+      'street': '#45B7D1',
+      'university': '#96CEB4',
+      'hospital': '#FFEAA7',
+      'attraction': '#DDA0DD'
+    };
+    
+    const color = colors[type] || '#FF6B6B';
+    
+    // Create SVG data URL for marker icon
+    return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="16" cy="16" r="14" fill="${color}" stroke="white" stroke-width="2"/>
+        <text x="16" y="20" text-anchor="middle" font-size="16" fill="white" font-weight="bold">🅿️</text>
+      </svg>
+    `)}`;
+  };
+
   const getAvailabilityColor = (available: number) => {
     if (available === 0) return '#dc2626';
     if (available < 5) return '#ca8a04';
