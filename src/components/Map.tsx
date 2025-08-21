@@ -25,9 +25,9 @@ const Map: React.FC<MapProps> = ({
   userLocation 
 }) => {
   const mapRef = useRef<HTMLDivElement>(null);
-  const [map, setMap] = useState<google.maps.Map | null>(null);
-  const [markers, setMarkers] = useState<google.maps.Marker[]>([]);
-  const [infoWindows, setInfoWindows] = useState<google.maps.InfoWindow[]>([]);
+  const [map, setMap] = useState<any>(null);
+  const [markers, setMarkers] = useState<any[]>([]);
+  const [infoWindows, setInfoWindows] = useState<any[]>([]);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const [mapError, setMapError] = useState<string | null>(null);
 
@@ -36,8 +36,15 @@ const Map: React.FC<MapProps> = ({
     if (isMapLoaded || mapError) return;
 
     try {
+      // Check if Google Maps API key is available
+      const apiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
+      if (!apiKey) {
+        setMapError('Google Maps API key not configured. Please check environment variables.');
+        return;
+      }
+
       const loader = new Loader({
-        apiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY || 'YOUR_API_KEY_HERE',
+        apiKey: apiKey,
         version: 'weekly',
         libraries: ['places'],
         // Cost optimization: Load only essential features
@@ -87,7 +94,7 @@ const Map: React.FC<MapProps> = ({
       }
     } catch (error) {
       console.error('Error loading Google Maps:', error);
-      setMapError('Failed to load map. Please refresh the page.');
+      setMapError('Failed to load Google Maps. Please check your API key and try again.');
     }
   }, [isMapLoaded, mapError, userLocation]);
 
