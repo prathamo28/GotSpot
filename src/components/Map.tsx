@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
+import { Loader } from '@googlemaps/js-api-loader';
 
 interface MapProps {
   parkingSpots: Array<{
@@ -23,19 +24,198 @@ const Map: React.FC<MapProps> = ({
   onSpotSelect,
   userLocation 
 }) => {
-  const [hoveredSpot, setHoveredSpot] = useState<number | null>(null);
-  const [zoom, setZoom] = useState(1);
+  const mapRef = useRef<HTMLDivElement>(null);
+  const [map, setMap] = useState<google.maps.Map | null>(null);
+  const [markers, setMarkers] = useState<google.maps.Marker[]>([]);
+  const [infoWindows, setInfoWindows] = useState<google.maps.InfoWindow[]>([]);
+  const [isMapLoaded, setIsMapLoaded] = useState(false);
+  const [mapError, setMapError] = useState<string | null>(null);
 
-  // Custom map coordinates for Gdansk (simplified for demo)
-  const mapCenter = { x: 200, y: 150 };
-  const mapScale = zoom * 0.8;
+  // Cost optimization: Only load map when component mounts
+  const initMap = useCallback(async () => {
+    if (isMapLoaded || mapError) return;
 
-  // Convert real coordinates to map coordinates (simplified)
-  const getMapPosition = (lat: number, lng: number) => {
-    // Simplified conversion for demo purposes
-    const x = mapCenter.x + (lng - 18.6466) * 1000 * mapScale;
-    const y = mapCenter.y + (54.3520 - lat) * 1000 * mapScale;
-    return { x, y };
+    try {
+      const loader = new Loader({
+        apiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY || 'YOUR_API_KEY_HERE',
+        version: 'weekly',
+        libraries: ['places'],
+        // Cost optimization: Load only essential features
+        mapIds: ['DEMO_MAP_ID']
+      });
+
+      const google = await loader.load();
+      
+      if (mapRef.current) {
+        // Center map on Gdansk
+        const gdanskCenter = { lat: 54.3520, lng: 18.6466 };
+        
+        const mapInstance = new google.maps.Map(mapRef.current, {
+          center: gdanskCenter,
+          zoom: 12,
+          // Cost optimization: Use simplified map styles
+          styles: [
+            {
+              featureType: 'poi.parking',
+              elementType: 'labels',
+              stylers: [{ visibility: 'on' }]
+            },
+            {
+              featureType: 'transit',
+              elementType: 'labels',
+              stylers: [{ visibility: 'off' }]
+            }
+          ],
+          // Cost optimization: Disable expensive features
+          disableDefaultUI: false,
+          zoomControl: true,
+          mapTypeControl: false,
+          streetViewControl: false,
+          fullscreenControl: false
+        });
+
+        setMap(mapInstance);
+        setIsMapLoaded(true);
+        
+        // Add parking spot markers
+        addParkingMarkers(mapInstance, google);
+        
+        // Add user location if available
+        if (userLocation) {
+          addUserLocationMarker(mapInstance, google, userLocation);
+        }
+      }
+    } catch (error) {
+      console.error('Error loading Google Maps:', error);
+      setMapError('Failed to load map. Please refresh the page.');
+    }
+  }, [isMapLoaded, mapError, userLocation]);
+
+  // Cost optimization: Efficient marker management
+  const addParkingMarkers = useCallback((mapInstance: google.maps.Map, google: any) => {
+    const newMarkers: google.maps.Marker[] = [];
+    const newInfoWindows: google.maps.InfoWindow[] = [];
+
+    parkingSpots.forEach(spot => {
+      // Create optimized marker
+      const marker = new google.maps.Marker({
+        position: spot.coordinates,
+        map: mapInstance,
+        title: spot.name,
+        icon: {
+          url: getMarkerIcon(spot.type),
+          scaledSize: new google.maps.Size(32, 32)
+        },
+        // Cost optimization: Reduce marker updates
+        optimized: true
+      });
+
+      // Create info window with pilot project branding
+      const infoWindow = new google.maps.InfoWindow({
+        content: createInfoWindowContent(spot),
+        maxWidth: 300
+      });
+
+      // Add click listener
+      marker.addListener('click', () => {
+        // Close all other info windows first
+        newInfoWindows.forEach(iw => iw.close());
+        infoWindow.open(mapInstance, marker);
+      });
+
+      newMarkers.push(marker);
+      newInfoWindows.push(infoWindow);
+    });
+
+    setMarkers(newMarkers);
+    setInfoWindows(newInfoWindows);
+  }, [parkingSpots]);
+
+  const addUserLocationMarker = useCallback((mapInstance: google.maps.Map, google: any, location: { lat: number; lng: number }) => {
+    new google.maps.Marker({
+      position: location,
+      map: mapInstance,
+      title: 'Your Location',
+      icon: {
+        url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="12" r="8" fill="#2563eb" stroke="white" stroke-width="2"/>
+            <circle cx="12" cy="12" r="3" fill="white"/>
+          </svg>
+        `),
+        scaledSize: new google.maps.Size(24, 24)
+      }
+    });
+  }, []);
+
+  const createInfoWindowContent = (spot: any) => {
+    return `
+      <div style="padding: 15px; min-width: 250px; font-family: Arial, sans-serif;">
+        <div style="display: flex; align-items: center; margin-bottom: 10px;">
+          <span style="font-size: 24px; margin-right: 10px;">${getSpotIcon(spot.type)}</span>
+          <div>
+            <h3 style="margin: 0; color: #2563eb; font-size: 16px;">${spot.name}</h3>
+            <p style="margin: 5px 0; color: #6b7280; font-size: 14px;">${spot.address}</p>
+          </div>
+        </div>
+        
+        <div style="background: #f9fafb; padding: 10px; border-radius: 8px; margin-bottom: 10px;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+            <span style="color: #374151;">Available:</span>
+            <span style="color: ${getAvailabilityColor(spot.available)}; font-weight: bold;">
+              ${spot.available}/${spot.total} spots
+            </span>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+            <span style="color: #374151;">Price:</span>
+            <span style="color: #059669; font-weight: bold;">${spot.price}</span>
+          </div>
+          <div style="display: flex; justify-content: space-between;">
+            <span style="color: #374151;">Rating:</span>
+            <span style="color: #f59e0b;">⭐ ${spot.rating}</span>
+          </div>
+        </div>
+        
+        <div style="display: flex; gap: 8px;">
+          <button 
+            onclick="window.selectSpot(${spot.id})"
+            style="
+              background: #2563eb; 
+              color: white; 
+              border: none; 
+              padding: 8px 16px; 
+              border-radius: 6px; 
+              cursor: pointer;
+              font-size: 14px;
+              font-weight: 500;
+              flex: 1;
+            "
+          >
+            🗺️ View Details
+          </button>
+          <button 
+            onclick="window.reserveSpot(${spot.id})"
+            style="
+              background: white; 
+              color: #2563eb; 
+              border: 1px solid #2563eb; 
+              padding: 8px 16px; 
+              border-radius: 6px; 
+              cursor: pointer;
+              font-size: 14px;
+              font-weight: 500;
+              flex: 1;
+            "
+          >
+            💳 Reserve Now
+          </button>
+        </div>
+        
+        <div style="margin-top: 10px; padding: 8px; background: #eff6ff; border-radius: 6px; text-align: center;">
+          <span style="color: #1e40af; font-size: 12px;">🚀 Pilot Project - Real-time Data</span>
+        </div>
+      </div>
+    `;
   };
 
   const getSpotIcon = (type: string) => {
@@ -50,18 +230,6 @@ const Map: React.FC<MapProps> = ({
     }
   };
 
-  const getSpotColor = (type: string) => {
-    const colors: { [key: string]: string } = {
-      'mall': '#FF6B6B',
-      'office': '#4ECDC4',
-      'street': '#45B7D1',
-      'university': '#96CEB4',
-      'hospital': '#FFEAA7',
-      'attraction': '#DDA0DD'
-    };
-    return colors[type] || '#FF6B6B';
-  };
-
   const getAvailabilityColor = (available: number) => {
     if (available === 0) return '#dc2626';
     if (available < 5) return '#ca8a04';
@@ -69,284 +237,125 @@ const Map: React.FC<MapProps> = ({
     return '#16a34a';
   };
 
+  // Cost optimization: Only load map when needed
+  useEffect(() => {
+    if (!isMapLoaded && !mapError) {
+      initMap();
+    }
+  }, [initMap, isMapLoaded, mapError]);
+
+  // Update markers when parking spots change
+  useEffect(() => {
+    if (map && isMapLoaded && markers.length > 0) {
+      markers.forEach((marker, index) => {
+        const spot = parkingSpots[index];
+        if (spot) {
+          marker.setPosition(spot.coordinates);
+          marker.setTitle(spot.name);
+        }
+      });
+    }
+  }, [parkingSpots, map, isMapLoaded, markers]);
+
+  // Highlight selected spot
+  useEffect(() => {
+    if (map && markers.length > 0 && selectedSpot !== null) {
+      markers.forEach((marker, index) => {
+        const spot = parkingSpots[index];
+        if (spot && spot.id === selectedSpot) {
+          marker.setAnimation(google.maps.Animation.BOUNCE);
+          map.panTo(spot.coordinates);
+          map.setZoom(16);
+        } else {
+          marker.setAnimation(null);
+        }
+      });
+    }
+  }, [selectedSpot, map, markers, parkingSpots]);
+
+  // Expose functions globally for info window buttons
+  useEffect(() => {
+    (window as any).selectSpot = (spotId: number) => {
+      if (onSpotSelect) {
+        onSpotSelect(spotId);
+      }
+    };
+    
+    (window as any).reserveSpot = (spotId: number) => {
+      if (onSpotSelect) {
+        onSpotSelect(spotId);
+      }
+    };
+  }, [onSpotSelect]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      // Close all info windows to prevent memory leaks
+      infoWindows.forEach(iw => iw.close());
+    };
+  }, [infoWindows]);
+
+  if (mapError) {
+    return (
+      <div className="map-error">
+        <div className="error-content">
+          <div className="error-icon">⚠️</div>
+          <h3>Map Loading Error</h3>
+          <p>{mapError}</p>
+          <button onClick={() => {
+            setMapError(null);
+            setIsMapLoaded(false);
+            initMap();
+          }} className="retry-button">
+            🔄 Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="map-container">
-      <div className="custom-map">
-        {/* Map Background */}
-        <svg 
-          width="100%" 
-          height="400" 
-          viewBox="0 0 400 300"
-          className="map-svg"
-        >
-          {/* Background */}
-          <rect width="400" height="300" fill="#f8fafc" stroke="#e2e8f0" strokeWidth="2"/>
-          
-          {/* Map Title */}
-          <text x="200" y="25" textAnchor="middle" fontSize="16" fontWeight="bold" fill="#374151">
-            🗺️ Gdansk Parking Map
-          </text>
-          
-          {/* Grid Lines */}
-          <defs>
-            <pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse">
-              <path d="M 50 0 L 0 0 0 50" fill="none" stroke="#e2e8f0" strokeWidth="1"/>
-            </pattern>
-          </defs>
-          <rect width="400" height="300" fill="url(#grid)"/>
-          
-          {/* Water Areas (simplified) */}
-          <ellipse cx="80" cy="80" rx="30" ry="20" fill="#bfdbfe" opacity="0.3"/>
-          <ellipse cx="320" cy="220" rx="25" ry="15" fill="#bfdbfe" opacity="0.3"/>
-          
-          {/* Main Roads */}
-          <path d="M 50 150 L 350 150" stroke="#94a3b8" strokeWidth="3" fill="none"/>
-          <path d="M 200 50 L 200 250" stroke="#94a3b8" strokeWidth="3" fill="none"/>
-          
-          {/* Parking Spots */}
-          {parkingSpots.map((spot) => {
-            const pos = getMapPosition(spot.coordinates.lat, spot.coordinates.lng);
-            const isSelected = selectedSpot === spot.id;
-            const isHovered = hoveredSpot === spot.id;
-            
-            return (
-              <g key={spot.id}>
-                {/* Spot Circle */}
-                <circle
-                  cx={pos.x}
-                  cy={pos.y}
-                  r={isSelected ? 12 : isHovered ? 10 : 8}
-                  fill={getSpotColor(spot.type)}
-                  stroke={isSelected ? "#1d4ed8" : "#ffffff"}
-                  strokeWidth={isSelected ? 3 : 2}
-                  opacity={isSelected ? 1 : 0.8}
-                  className="parking-spot"
-                  onMouseEnter={() => setHoveredSpot(spot.id)}
-                  onMouseLeave={() => setHoveredSpot(null)}
-                  onClick={() => onSpotSelect && onSpotSelect(spot.id)}
-                  style={{ cursor: 'pointer' }}
-                />
-                
-                {/* Spot Icon */}
-                <text
-                  x={pos.x}
-                  y={pos.y + 4}
-                  textAnchor="middle"
-                  fontSize={isSelected ? 14 : 12}
-                  fill="white"
-                  fontWeight="bold"
-                >
-                  {getSpotIcon(spot.type)}
-                </text>
-                
-                {/* Availability Indicator */}
-                <circle
-                  cx={pos.x + 15}
-                  cy={pos.y - 15}
-                  r={6}
-                  fill={getAvailabilityColor(spot.available)}
-                  stroke="white"
-                  strokeWidth="1"
-                />
-                <text
-                  x={pos.x + 15}
-                  y={pos.y - 12}
-                  textAnchor="middle"
-                  fontSize="8"
-                  fill="white"
-                  fontWeight="bold"
-                >
-                  {spot.available}
-                </text>
-                
-                {/* Hover/Selection Info */}
-                {(isHovered || isSelected) && (
-                  <g>
-                    {/* Info Background */}
-                    <rect
-                      x={pos.x + 20}
-                      y={pos.y - 30}
-                      width="120"
-                      height="80"
-                      fill="white"
-                      stroke="#e5e7eb"
-                      strokeWidth="1"
-                      rx="8"
-                      filter="drop-shadow(0 4px 6px rgba(0,0,0,0.1))"
-                    />
-                    
-                    {/* Spot Name */}
-                    <text
-                      x={pos.x + 26}
-                      y={pos.y - 15}
-                      fontSize="10"
-                      fontWeight="bold"
-                      fill="#374151"
-                    >
-                      {spot.name.length > 15 ? spot.name.substring(0, 15) + '...' : spot.name}
-                    </text>
-                    
-                    {/* Address */}
-                    <text
-                      x={pos.x + 26}
-                      y={pos.y - 5}
-                      fontSize="8"
-                      fill="#6b7280"
-                    >
-                      {spot.address.split(',')[0]}
-                    </text>
-                    
-                    {/* Price */}
-                    <text
-                      x={pos.x + 26}
-                      y={pos.y + 5}
-                      fontSize="8"
-                      fill="#059669"
-                      fontWeight="bold"
-                    >
-                      {spot.price}
-                    </text>
-                    
-                    {/* Rating */}
-                    <text
-                      x={pos.x + 26}
-                      y={pos.y + 15}
-                      fontSize="8"
-                      fill="#f59e0b"
-                    >
-                      ⭐ {spot.rating}
-                    </text>
-                    
-                    {/* Action Button */}
-                    <rect
-                      x={pos.x + 26}
-                      y={pos.y + 20}
-                      width="60"
-                      height="20"
-                      fill="#2563eb"
-                      rx="4"
-                      style={{ cursor: 'pointer' }}
-                      onClick={() => onSpotSelect && onSpotSelect(spot.id)}
-                    />
-                    <text
-                      x={pos.x + 56}
-                      y={pos.y + 32}
-                      fontSize="8"
-                      fill="white"
-                      textAnchor="middle"
-                      fontWeight="bold"
-                    >
-                      Select
-                    </text>
-                  </g>
-                )}
-              </g>
-            );
-          })}
-          
-          {/* User Location */}
-          {userLocation && (
-            <g>
-              <circle
-                cx={mapCenter.x}
-                cy={mapCenter.y}
-                r={8}
-                fill="#2563eb"
-                stroke="white"
-                strokeWidth="2"
-              />
-              <text
-                x={mapCenter.x}
-                y={mapCenter.y + 4}
-                textAnchor="middle"
-                fontSize="12"
-                fill="white"
-                fontWeight="bold"
-              >
-                📍
-              </text>
-              <text
-                x={mapCenter.x}
-                y={mapCenter.y + 25}
-                textAnchor="middle"
-                fontSize="10"
-                fill="#2563eb"
-                fontWeight="bold"
-              >
-                You
-              </text>
-            </g>
-          )}
-          
-          {/* Legend */}
-          <g>
-            <rect x="10" y="10" width="150" height="80" fill="white" stroke="#e5e7eb" rx="8" opacity="0.9"/>
-            <text x="20" y="25" fontSize="10" fontWeight="bold" fill="#374151">Legend</text>
-            
-            {/* Mall */}
-            <circle cx="25" cy="40" r="4" fill="#FF6B6B"/>
-            <text x="35" y="43" fontSize="8" fill="#374151">🏬 Shopping</text>
-            
-            {/* Office */}
-            <circle cx="25" cy="55" r="4" fill="#4ECDC4"/>
-            <text x="35" y="58" fontSize="8" fill="#374151">🏢 Business</text>
-            
-            {/* University */}
-            <circle cx="25" cy="70" r="4" fill="#96CEB4"/>
-            <text x="35" y="73" fontSize="8" fill="#374151">🎓 Education</text>
-            
-            {/* Street */}
-            <circle cx="85" cy="40" r="4" fill="#45B7D1"/>
-            <text x="95" y="43" fontSize="8" fill="#374151">🛣️ Street</text>
-            
-            {/* Hospital */}
-            <circle cx="85" cy="55" r="4" fill="#FFEAA7"/>
-            <text x="95" y="58" fontSize="8" fill="#374151">🏥 Medical</text>
-            
-            {/* Attraction */}
-            <circle cx="85" cy="70" r="4" fill="#DDA0DD"/>
-            <text x="95" y="73" fontSize="8" fill="#374151">🎡 Attraction</text>
-          </g>
-        </svg>
-      </div>
+      <div ref={mapRef} className="map" style={{ width: '100%', height: '400px' }} />
       
       {/* Map Controls */}
       <div className="map-controls">
         <button 
           className="map-control-btn"
-          onClick={() => setZoom(Math.min(zoom + 0.2, 2))}
+          onClick={() => map?.setZoom((map.getZoom() || 12) + 1)}
           title="Zoom In"
         >
           ➕
         </button>
         <button 
           className="map-control-btn"
-          onClick={() => setZoom(Math.max(zoom - 0.2, 0.5))}
+          onClick={() => map?.setZoom((map.getZoom() || 12) - 1)}
           title="Zoom Out"
         >
           ➖
         </button>
-        <button 
-          className="map-control-btn"
-          onClick={() => setZoom(1)}
-          title="Reset Zoom"
-        >
-          🔄
-        </button>
         {userLocation && (
           <button 
             className="map-control-btn"
-            onClick={() => setZoom(1)}
+            onClick={() => map?.panTo(userLocation)}
             title="Center on my location"
           >
             📍
           </button>
         )}
+        <button 
+          className="map-control-btn"
+          onClick={() => map?.panTo({ lat: 54.3520, lng: 18.6466 })}
+          title="Center on Gdansk"
+        >
+          🏙️
+        </button>
       </div>
-      
-      {/* Map Instructions */}
-      <div className="map-instructions">
-        <p>🗺️ <strong>Interactive Map:</strong> Click on parking spots to select them • Hover for details • Use controls to zoom</p>
+
+      {/* Pilot Project Banner */}
+      <div className="pilot-banner">
+        <p>🚀 <strong>Pilot Project Active</strong> - Real-time parking data from Gdansk</p>
       </div>
     </div>
   );

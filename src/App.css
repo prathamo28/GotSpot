@@ -419,37 +419,68 @@
   position: relative;
 }
 
-.custom-map {
+.map {
   border-radius: 12px;
-  overflow: hidden;
-  background: white;
 }
 
-.map-svg {
-  display: block;
-  width: 100%;
-  height: auto;
-}
-
-.parking-spot {
-  transition: all 0.2s ease;
-}
-
-.parking-spot:hover {
-  transform: scale(1.1);
-}
-
-.map-instructions {
+/* Map Error State */
+.map-error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 400px;
   background: #f9fafb;
-  border-top: 1px solid #e5e7eb;
+  border-radius: 12px;
+  border: 2px solid #e5e7eb;
+}
+
+.error-content {
+  text-align: center;
+  padding: 20px;
+}
+
+.error-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.error-content h3 {
+  color: #374151;
+  margin: 0 0 8px 0;
+}
+
+.error-content p {
+  color: #6b7280;
+  margin: 0 0 16px 0;
+}
+
+.retry-button {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.retry-button:hover {
+  background: #1d4ed8;
+}
+
+/* Pilot Project Banner */
+.pilot-banner {
+  background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+  border-top: 1px solid #22c55e;
   padding: 12px;
   text-align: center;
 }
 
-.map-instructions p {
+.pilot-banner p {
+  color: #166534;
+  font-size: 14px;
   margin: 0;
-  color: #6b7280;
-  font-size: 12px;
+  font-weight: 500;
 }
 
 .map-controls {
