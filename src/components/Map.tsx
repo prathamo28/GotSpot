@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { Loader } from '@googlemaps/js-api-loader';
 
 interface MapProps {
   parkingSpots: Array<{
@@ -31,27 +30,18 @@ const Map: React.FC<MapProps> = ({
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const [mapError, setMapError] = useState<string | null>(null);
 
-  // Cost optimization: Only load map when component mounts
+  // Use Google Maps API that's already loaded in App component
   const initMap = useCallback(async () => {
     if (isMapLoaded || mapError) return;
 
     try {
-      // Check if Google Maps API key is available
-      const apiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
-      if (!apiKey) {
-        setMapError('Google Maps API key not configured. Please check environment variables.');
+      // Check if Google Maps API is already loaded
+      if (!(window as any).google?.maps) {
+        setMapError('Google Maps API not loaded. Please wait for it to load.');
         return;
       }
 
-      const loader = new Loader({
-        apiKey: apiKey,
-        version: 'weekly',
-        libraries: ['places'],
-        // Cost optimization: Load only essential features
-        mapIds: ['DEMO_MAP_ID']
-      });
-
-      const google = await loader.load();
+      const google = (window as any).google;
       
       if (mapRef.current) {
         // Center map on Gdansk
