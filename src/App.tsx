@@ -9,7 +9,6 @@ import Header from './components/Header';
 import SearchSection from './components/SearchSection';
 import ParkingList from './components/ParkingList';
 import ParkingDetails from './components/ParkingDetails';
-import AddSpotModal from './components/AddSpotModal';
 import Statistics from './components/Statistics';
 import Map from './components/Map';
 
@@ -18,6 +17,10 @@ const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loginError, setLoginError] = useState(false);
   const DEMO_PASSWORD = 'gotspot2025';
+  
+  // City selection state
+  const [selectedCity, setSelectedCity] = useState<string>('');
+  const [showCitySelection, setShowCitySelection] = useState(false);
   
   // App state
   const [destination, setDestination] = useState('');
@@ -28,8 +31,16 @@ const App: React.FC = () => {
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [detailsSpotId, setDetailsSpotId] = useState<number | null>(null);
   const [showDetails, setShowDetails] = useState(false);
-  const [showAddSpot, setShowAddSpot] = useState(false);
   const [userContributions, setUserContributions] = useState<ParkingSpot[]>([]);
+
+  // Available cities
+  const availableCities = [
+    { id: 'gdansk', name: 'Gdańsk', coordinates: { lat: 54.3520, lng: 18.6466 } },
+    { id: 'warsaw', name: 'Warszawa', coordinates: { lat: 52.2297, lng: 21.0122 } },
+    { id: 'krakow', name: 'Kraków', coordinates: { lat: 50.0647, lng: 19.9450 } },
+    { id: 'wroclaw', name: 'Wrocław', coordinates: { lat: 51.1079, lng: 17.0385 } },
+    { id: 'poznan', name: 'Poznań', coordinates: { lat: 52.4064, lng: 16.9252 } }
+  ];
 
   // Demo parking spots data
   const allParkingSpots: ParkingSpot[] = [
@@ -320,8 +331,15 @@ const App: React.FC = () => {
 
   useEffect(() => {
     const savedAuth = sessionStorage.getItem('gotspot_demo_auth');
+    const savedCity = sessionStorage.getItem('gotspot_selected_city');
+    
     if (savedAuth === 'true') {
       setIsAuthenticated(true);
+      if (savedCity) {
+        setSelectedCity(savedCity);
+      } else {
+        setShowCitySelection(true);
+      }
     }
     
     // Get user location
@@ -376,6 +394,7 @@ const App: React.FC = () => {
       setIsAuthenticated(true);
       setLoginError(false);
       sessionStorage.setItem('gotspot_demo_auth', 'true');
+      setShowCitySelection(true);
     } else {
       setLoginError(true);
     }
@@ -383,10 +402,24 @@ const App: React.FC = () => {
 
   const handleLogout = () => {
     setIsAuthenticated(false);
+    setSelectedCity('');
+    setShowCitySelection(false);
     sessionStorage.removeItem('gotspot_demo_auth');
+    sessionStorage.removeItem('gotspot_selected_city');
     setShowResults(false);
     setDestination('');
     setNearbySpots([]);
+  };
+
+  // City selection handler
+  const handleCitySelection = (cityId: string) => {
+    const city = availableCities.find(c => c.id === cityId);
+    if (city) {
+      setSelectedCity(cityId);
+      setShowCitySelection(false);
+      sessionStorage.setItem('gotspot_selected_city', cityId);
+      setUserLocation(city.coordinates);
+    }
   };
 
   // Search functionality
@@ -447,7 +480,7 @@ const App: React.FC = () => {
       
       // Search for parking near the destination
       const searchRequest = {
-        query: `parking near ${query}, Gdańsk, Poland`,
+        query: `parking near ${query}, ${selectedCity}, Poland`,
         type: ['parking'],
         location: userLocation || { lat: 54.3520, lng: 18.6466 },
         radius: 5000, // 5km search radius
@@ -460,7 +493,7 @@ const App: React.FC = () => {
             const realSpots: ParkingSpot[] = results.map((place, index) => ({
               id: 1000 + index, // Unique ID for real spots
               name: place.name || `Parking ${index + 1}`,
-              address: place.formatted_address || place.vicinity || 'Gdańsk, Poland',
+              address: place.formatted_address || place.vicinity || `${selectedCity}, Poland`,
               available: Math.floor(Math.random() * 50) + 10, // Simulated availability
               total: Math.floor(Math.random() * 100) + 50,
               price: Math.random() > 0.5 ? '3 PLN/h' : 'Free',
@@ -512,30 +545,6 @@ const App: React.FC = () => {
     setDetailsSpotId(null);
   };
 
-  const openAddSpotForm = () => {
-    setShowAddSpot(true);
-  };
-
-  const closeAddSpotForm = () => {
-    setShowAddSpot(false);
-  };
-
-  const addNewParkingSpot = (newSpot: Omit<ParkingSpot, 'id'>) => {
-    const spotWithId: ParkingSpot = {
-      ...newSpot,
-      id: Date.now(),
-      lastUpdated: 'Just added',
-      isRealSpot: true
-    };
-    
-    setUserContributions(prev => [...prev, spotWithId]);
-    
-    console.log('✅ New parking spot added:', spotWithId);
-    alert(`🎉 Successfully added "${spotWithId.name}" to our database!`);
-    
-    closeAddSpotForm();
-  };
-
   const updateExistingSpot = (spotId: number, updates: Partial<ParkingSpot>) => {
     const updatedSpots = allParkingSpots.map(spot => 
       spot.id === spotId ? { ...spot, ...updates, lastUpdated: 'Just updated' } : spot
@@ -551,11 +560,34 @@ const App: React.FC = () => {
     [detailsSpotId]
   );
 
-  const totalSpots = allParkingSpots.length + userContributions.length;
-  const availableSpots = allParkingSpots.reduce((sum, spot) => sum + spot.available, 0) +
-                        userContributions.reduce((sum, spot) => sum + spot.available, 0);
+  const totalSpots = allParkingSpots.length;
+  const availableSpots = allParkingSpots.reduce((sum, spot) => sum + spot.available, 0);
   const realSpots = allParkingSpots.filter(spot => spot.isRealSpot).length;
   const demoSpots = allParkingSpots.filter(spot => !spot.isRealSpot).length;
+
+  // Render city selection if needed
+  if (isAuthenticated && showCitySelection) {
+    return (
+      <div className="city-selection-container">
+        <div className="city-selection-card">
+          <h2>Select Your City</h2>
+          <p>Choose a city to explore parking options</p>
+          <div className="city-grid">
+            {availableCities.map(city => (
+              <button
+                key={city.id}
+                className="city-button"
+                onClick={() => handleCitySelection(city.id)}
+              >
+                <span className="city-name">{city.name}</span>
+                <span className="city-subtitle">Poland</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // Render login form if not authenticated
   if (!isAuthenticated) {
@@ -566,10 +598,11 @@ const App: React.FC = () => {
   return (
     <div className="app-container">
       <Header 
-        onAddSpot={openAddSpotForm}
         onLogout={handleLogout}
         totalSpots={totalSpots}
         availableSpots={availableSpots}
+        selectedCity={selectedCity}
+        availableCities={availableCities}
       />
       
       <SearchSection 
@@ -580,6 +613,15 @@ const App: React.FC = () => {
         viewMode={viewMode}
         onViewModeChange={setViewMode}
       />
+      
+      {/* Map always visible on home page */}
+      <div className="map-section">
+        <Map 
+          parkingSpots={nearbySpots.length > 0 ? nearbySpots : allParkingSpots}
+          userLocation={userLocation}
+          onSpotSelect={openSpotDetails}
+        />
+      </div>
       
       {showResults && (
         <>
@@ -597,13 +639,7 @@ const App: React.FC = () => {
               onSpotClick={openSpotDetails}
               userContributions={userContributions}
             />
-          ) : (
-            <Map 
-              parkingSpots={nearbySpots}
-              userLocation={userLocation}
-              onSpotSelect={openSpotDetails}
-            />
-          )}
+          ) : null}
         </>
       )}
       
@@ -613,13 +649,6 @@ const App: React.FC = () => {
         isOpen={showDetails}
         onClose={closeSpotDetails}
         onUpdateSpot={updateExistingSpot}
-      />
-      
-      <AddSpotModal 
-        isOpen={showAddSpot}
-        onClose={closeAddSpotForm}
-        onSubmit={addNewParkingSpot}
-        userLocation={userLocation}
       />
     </div>
   );

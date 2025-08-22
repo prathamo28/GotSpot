@@ -6,8 +6,8 @@
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   line-height: 1.6;
-  color: #1a202c;
-  background: #f7fafc;
+  color: #1A202C;
+  background: #E0F2F7;
   margin: 0;
   padding: 0;
 }
@@ -17,8 +17,87 @@ body {
   margin: 0 auto;
   background: white;
   min-height: 100vh;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-  position: relative;
+  box-shadow: 0 0 20px rgba(26, 32, 44, 0.1);
+}
+
+/* City Selection Styles */
+.city-selection-container {
+  min-height: 100vh;
+  background: #E0F2F7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.city-selection-card {
+  background: #1A202C;
+  color: white;
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(26, 32, 44, 0.3);
+  text-align: center;
+  max-width: 400px;
+  width: 100%;
+}
+
+.city-selection-card h2 {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0 0 16px 0;
+  color: #FFFFFF;
+}
+
+.city-selection-card p {
+  font-size: 16px;
+  color: #E0F2F7;
+  margin: 0 0 32px 0;
+  opacity: 0.9;
+}
+
+.city-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.city-button {
+  background: #FFFFFF;
+  color: #1A202C;
+  border: none;
+  padding: 20px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.city-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(255, 255, 255, 0.3);
+  background: #F7FAFC;
+}
+
+.city-name {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.city-subtitle {
+  font-size: 14px;
+  opacity: 0.7;
+  font-weight: 500;
+}
+
+/* Map Section Styles */
+.map-section {
+  padding: 20px;
+  background: white;
+  border-bottom: 1px solid #E0F2F7;
 }
 
 /* Global utility classes */
@@ -45,7 +124,7 @@ body {
 
 .loading-spinner {
   border: 2px solid #e2e8f0;
-  border-top: 2px solid #3182ce;
+  border-top: 2px solid #1A202C;
   border-radius: 50%;
   width: 20px;
   height: 20px;
@@ -69,7 +148,6 @@ body {
   border: 1px solid #feb2b2;
 }
 
-/* Success states */
 .success-message {
   background: #c6f6d5;
   color: #22543d;
@@ -83,7 +161,20 @@ body {
 /* Responsive utilities */
 @media (max-width: 480px) {
   .app-container {
+    max-width: 100%;
     margin: 0;
-    box-shadow: none;
+  }
+  
+  .city-selection-card {
+    padding: 24px;
+    margin: 16px;
+  }
+  
+  .city-selection-card h2 {
+    font-size: 24px;
+  }
+  
+  .city-button {
+    padding: 16px;
   }
 }

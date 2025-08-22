@@ -2,19 +2,28 @@ import React from 'react';
 import './Header.css';
 
 interface HeaderProps {
-  onAddSpot: () => void;
   onLogout: () => void;
   totalSpots: number;
   availableSpots: number;
+  selectedCity: string;
+  availableCities: Array<{ id: string; name: string }>;
 }
 
-const Header: React.FC<HeaderProps> = ({ onAddSpot, onLogout, totalSpots, availableSpots }) => {
+const Header: React.FC<HeaderProps> = ({ 
+  onLogout, 
+  totalSpots, 
+  availableSpots, 
+  selectedCity,
+  availableCities 
+}) => {
+  const cityName = availableCities.find(c => c.id === selectedCity)?.name || 'Gdańsk';
+
   return (
     <header className="app-header">
       <div className="header-content">
         <div className="header-brand">
           <h1>GotSpot</h1>
-          <p>Smart Parking • Gdansk</p>
+          <p>SMART PARKING • {cityName.toUpperCase()}</p>
         </div>
         
         <div className="header-stats">
@@ -29,18 +38,13 @@ const Header: React.FC<HeaderProps> = ({ onAddSpot, onLogout, totalSpots, availa
         </div>
         
         <div className="header-actions">
-          <button onClick={onAddSpot} className="add-spot-button">
-            Add Parking Spot
-          </button>
-          <button onClick={onLogout} className="logout-button">
-            Exit Demo
+          <button 
+            className="logout-button"
+            onClick={onLogout}
+          >
+            Logout
           </button>
         </div>
-      </div>
-      
-      <div className="pilot-banner">
-        <span className="pilot-badge">PILOT PROJECT</span>
-        <span className="pilot-text">Testing smart parking solution in Gdansk, Poland</span>
       </div>
     </header>
   );

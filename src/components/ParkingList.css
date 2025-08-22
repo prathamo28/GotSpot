@@ -1,7 +1,7 @@
-/* Parking List Styles - Modern Professional Design */
+/* Parking List Styles - New Color Palette from Sign-up Image */
 .parking-list {
   padding: 24px 20px;
-  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+  background: #E0F2F7;
   min-height: 400px;
   max-width: 1200px;
   margin: 0 auto;
@@ -12,8 +12,8 @@
   border-radius: 20px;
   padding: 24px;
   margin-bottom: 20px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 20px rgba(26, 32, 44, 0.06);
+  border: 1px solid #1A202C;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
@@ -28,15 +28,15 @@
   left: 0;
   right: 0;
   height: 3px;
-  background: linear-gradient(90deg, #3b82f6, #10b981, #f59e0b, #ef4444);
+  background: linear-gradient(90deg, #1A202C, #E0F2F7, #FFFFFF);
   opacity: 0;
   transition: opacity 0.3s ease;
 }
 
 .spot-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-  border-color: #cbd5e0;
+  box-shadow: 0 12px 40px rgba(26, 32, 44, 0.15);
+  border-color: #1A202C;
 }
 
 .spot-card:hover::before {
@@ -57,13 +57,13 @@
 .spot-type-icon {
   width: 56px;
   height: 56px;
-  background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+  background: #E0F2F7;
   border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  border: 2px solid #e2e8f0;
+  border: 2px solid #1A202C;
   position: relative;
   overflow: hidden;
 }
@@ -75,7 +75,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  background: #1A202C;
   opacity: 0;
   transition: opacity 0.3s ease;
 }
@@ -87,7 +87,7 @@
 .spot-type-icon svg {
   width: 24px;
   height: 24px;
-  color: #64748b;
+  color: #1A202C;
   z-index: 1;
   position: relative;
 }
@@ -100,7 +100,7 @@
 .spot-name {
   font-size: 20px;
   font-weight: 700;
-  color: #1e293b;
+  color: #1A202C;
   margin: 0 0 10px 0;
   line-height: 1.3;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -132,16 +132,16 @@
 }
 
 .user-contributed-badge {
-  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
-  color: white;
+  background: #1A202C;
+  color: #FFFFFF;
   padding: 6px 12px;
   border-radius: 20px;
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.8px;
-  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 2px 8px rgba(26, 32, 44, 0.3);
+  border: 1px solid #1A202C;
 }
 
 .spot-rating {
@@ -150,9 +150,9 @@
   align-items: center;
   gap: 6px;
   padding: 12px 16px;
-  background: #f8fafc;
+  background: #E0F2F7;
   border-radius: 12px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid #1A202C;
 }
 
 .rating-stars {
@@ -165,7 +165,7 @@
 .rating-number {
   font-size: 14px;
   font-weight: 600;
-  color: #64748b;
+  color: #1A202C;
 }
 
 .spot-meta {
@@ -174,7 +174,7 @@
   gap: 16px;
   margin-top: 20px;
   padding-top: 20px;
-  border-top: 1px solid #f1f5f9;
+  border-top: 1px solid #E0F2F7;
 }
 
 .meta-item {
@@ -182,22 +182,22 @@
   flex-direction: column;
   gap: 6px;
   padding: 16px;
-  background: #f8fafc;
+  background: #E0F2F7;
   border-radius: 12px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid #1A202C;
   text-align: center;
   transition: all 0.2s ease;
 }
 
 .meta-item:hover {
-  background: #f1f5f9;
-  border-color: #cbd5e0;
+  background: #F7FAFC;
+  border-color: #1A202C;
 }
 
 .meta-label {
   font-size: 11px;
   font-weight: 600;
-  color: #64748b;
+  color: #1A202C;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -205,7 +205,7 @@
 .meta-value {
   font-size: 16px;
   font-weight: 700;
-  color: #1e293b;
+  color: #1A202C;
 }
 
 .availability-indicator {
@@ -221,19 +221,19 @@
 }
 
 .availability-high {
-  background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+  background: #dcfce7;
   color: #166534;
   border: 1px solid #bbf7d0;
 }
 
 .availability-medium {
-  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  background: #fef3c7;
   color: #92400e;
   border: 1px solid #fde68a;
 }
 
 .availability-low {
-  background: linear-gradient(135deg, #fee2e2, #fecaca);
+  background: #fee2e2;
   color: #991b1b;
   border: 1px solid #fecaca;
 }
@@ -246,26 +246,26 @@
   border-radius: 20px;
   font-size: 13px;
   font-weight: 600;
-  background: linear-gradient(135deg, #dbeafe, #bfdbfe);
-  color: #1e40af;
-  border: 1px solid #bfdbfe;
-  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+  background: #1A202C;
+  color: #FFFFFF;
+  border: 1px solid #1A202C;
+  box-shadow: 0 2px 8px rgba(26, 32, 44, 0.2);
 }
 
 .price-tag.free {
-  background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+  background: #dcfce7;
   color: #166534;
   border-color: #bbf7d0;
 }
 
 .price-tag.expensive {
-  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  background: #fef3c7;
   color: #92400e;
   border-color: #fde68a;
 }
 
 .price-tag.very-expensive {
-  background: linear-gradient(135deg, #fee2e2, #fecaca);
+  background: #fee2e2;
   color: #991b1b;
   border-color: #fecaca;
 }
@@ -279,18 +279,18 @@
 
 .feature-tag {
   padding: 6px 12px;
-  background: #f1f5f9;
-  color: #475569;
+  background: #E0F2F7;
+  color: #1A202C;
   border-radius: 20px;
   font-size: 12px;
   font-weight: 500;
-  border: 1px solid #e2e8f0;
+  border: 1px solid #1A202C;
   transition: all 0.2s ease;
 }
 
 .feature-tag:hover {
-  background: #e2e8f0;
-  color: #334155;
+  background: #F7FAFC;
+  color: #1A202C;
 }
 
 .last-updated {
