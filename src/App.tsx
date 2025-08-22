@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import './App.css';
 import Map from './components/Map';
 import Payment from './components/Payment';
@@ -20,6 +20,7 @@ interface ParkingSpot {
     lng: number;
   };
   features: string[];
+  images?: string[];
 }
 
 const App: React.FC = () => {
@@ -39,6 +40,8 @@ const App: React.FC = () => {
   const [showPayment, setShowPayment] = useState(false);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [reservations, setReservations] = useState<string[]>([]);
+  const [detailsSpotId, setDetailsSpotId] = useState<number | null>(null);
+  const [showDetails, setShowDetails] = useState(false);
 
   useEffect(() => {
     const savedAuth = sessionStorage.getItem('gotspot_demo_auth');
@@ -81,7 +84,7 @@ const App: React.FC = () => {
   };
 
   // Enhanced parking data for Gdansk with real coordinates
-  const allParkingSpots: ParkingSpot[] = [
+  const baseParkingSpots: ParkingSpot[] = [
     {
       id: 1,
       name: "Galeria Przymorze Underground",
@@ -93,7 +96,11 @@ const App: React.FC = () => {
       rating: 4.5,
       lastUpdated: "2 min ago",
       coordinates: { lat: 54.4195, lng: 18.5706 },
-      features: ["Covered", "Security", "Shopping", "Restaurants"]
+      features: ["Covered", "Security", "Shopping", "Restaurants"],
+      images: [
+        'https://images.unsplash.com/photo-1506521781263-d8422e82f27a?q=80&w=1200&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1531390820546-5d67b3b6b9df?q=80&w=1200&auto=format&fit=crop'
+      ]
     },
     {
       id: 2,
@@ -106,7 +113,10 @@ const App: React.FC = () => {
       rating: 4.2,
       lastUpdated: "1 min ago",
       coordinates: { lat: 54.4156, lng: 18.5712 },
-      features: ["Business", "Security", "24/7", "EV Charging"]
+      features: ["Business", "Security", "24/7", "EV Charging"],
+      images: [
+        'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?q=80&w=1200&auto=format&fit=crop'
+      ]
     },
     {
       id: 3,
@@ -119,7 +129,10 @@ const App: React.FC = () => {
       rating: 3.8,
       lastUpdated: "5 min ago",
       coordinates: { lat: 54.4115, lng: 18.5601 },
-      features: ["Street", "Historic", "Tourism", "Free weekends"]
+      features: ["Street", "Historic", "Tourism", "Free weekends"],
+      images: [
+        'https://images.unsplash.com/photo-1528909514045-2fa4ac7a08ba?q=80&w=1200&auto=format&fit=crop'
+      ]
     },
     {
       id: 4,
@@ -132,7 +145,10 @@ const App: React.FC = () => {
       rating: 4.1,
       lastUpdated: "3 min ago",
       coordinates: { lat: 54.3963, lng: 18.5767 },
-      features: ["Education", "Student discount", "Security", "Library"]
+      features: ["Education", "Student discount", "Security", "Library"],
+      images: [
+        'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=1200&auto=format&fit=crop'
+      ]
     },
     {
       id: 5,
@@ -145,7 +161,10 @@ const App: React.FC = () => {
       rating: 4.3,
       lastUpdated: "1 min ago",
       coordinates: { lat: 54.3789, lng: 18.6078 },
-      features: ["Shopping", "Cinema", "Food court", "Family"]
+      features: ["Shopping", "Cinema", "Food court", "Family"],
+      images: [
+        'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1200&auto=format&fit=crop'
+      ]
     },
     {
       id: 6,
@@ -158,7 +177,10 @@ const App: React.FC = () => {
       rating: 4.0,
       lastUpdated: "4 min ago",
       coordinates: { lat: 54.3614, lng: 18.6201 },
-      features: ["Medical", "Patient priority", "Security", "24/7"]
+      features: ["Medical", "Patient priority", "Security", "24/7"],
+      images: [
+        'https://images.unsplash.com/photo-1586773860418-d37222d8fce3?q=80&w=1200&auto=format&fit=crop'
+      ]
     },
     {
       id: 7,
@@ -171,7 +193,10 @@ const App: React.FC = () => {
       rating: 4.4,
       lastUpdated: "2 min ago",
       coordinates: { lat: 54.4147, lng: 18.5478 },
-      features: ["Family", "Nature", "Large capacity", "Weekend busy"]
+      features: ["Family", "Nature", "Large capacity", "Weekend busy"],
+      images: [
+        'https://images.unsplash.com/photo-1469474968028-56623f02e42e?q=80&w=1200&auto=format&fit=crop'
+      ]
     },
     {
       id: 8,
@@ -184,9 +209,52 @@ const App: React.FC = () => {
       rating: 4.6,
       lastUpdated: "1 min ago",
       coordinates: { lat: 54.3556, lng: 18.6494 },
-      features: ["Downtown", "Shopping", "Restaurants", "Historic center"]
+      features: ["Downtown", "Shopping", "Restaurants", "Historic center"],
+      images: [
+        'https://images.unsplash.com/photo-1494526585095-c41746248156?q=80&w=1200&auto=format&fit=crop'
+      ]
     }
   ];
+
+  // Generate additional demo spots around Gdansk for recommendations
+  const generateAdditionalSpots = (seed: ParkingSpot[], count: number): ParkingSpot[] => {
+    const results: ParkingSpot[] = [];
+    const baseLat = 54.3722; // Gdansk approx
+    const baseLng = 18.6389;
+    const types = ['mall', 'office', 'street', 'university', 'hospital', 'attraction'];
+    for (let i = 0; i < count; i++) {
+      const id = seed.length + i + 1;
+      const lat = baseLat + ((i % 10) - 5) * 0.005 + (i * 0.0007);
+      const lng = baseLng + ((Math.floor(i / 10) % 10) - 5) * 0.006 + (i * 0.0005);
+      const type = types[i % types.length];
+      const available = Math.max(0, (i * 7) % 120);
+      const total = 80 + (i % 12) * 20;
+      const priceTier = (i % 4) + 1; // 1..4
+      const price = priceTier === 1 ? 'Free' : `${priceTier + 1} PLN/h`;
+      results.push({
+        id,
+        name: `Gdansk Parking Zone ${id}`,
+        address: `Auto-generated location #${id}, Gdansk`,
+        available,
+        total,
+        price,
+        type,
+        rating: 3.5 + (i % 15) / 10,
+        lastUpdated: `${(i % 5) + 1} min ago`,
+        coordinates: { lat, lng },
+        features: ['Lighting', 'Cameras', 'Open 24/7'],
+        images: [
+          'https://images.unsplash.com/photo-1506521781263-d8422e82f27a?q=80&w=1200&auto=format&fit=crop'
+        ]
+      });
+    }
+    return results;
+  };
+
+  const allParkingSpots: ParkingSpot[] = useMemo(() => {
+    const extras = generateAdditionalSpots(baseParkingSpots, 52); // base 8 + 52 = 60+
+    return [...baseParkingSpots, ...extras];
+  }, []);
 
   const popularDestinations = [
     { name: "University of Gdansk", category: "Education", coordinates: { lat: 54.3963, lng: 18.5767 } },
@@ -243,15 +311,8 @@ const App: React.FC = () => {
   };
 
   const getSpotIcon = (type: string) => {
-    switch(type) {
-      case 'mall': return '🏬';
-      case 'office': return '🏢';
-      case 'street': return '🛣️';
-      case 'university': return '🎓';
-      case 'hospital': return '🏥';
-      case 'attraction': return '🎡';
-      default: return '🅿️';
-    }
+    // Return empty string for professional look
+    return '';
   };
 
   const getAvailabilityColor = (available: number) => {
@@ -290,10 +351,18 @@ const App: React.FC = () => {
   };
 
   const handleSpotSelect = (spotId: number) => {
+    // Map selection only when in map context
     setSelectedSpot(spotId);
-    if (viewMode === 'list') {
-      setViewMode('map');
-    }
+  };
+
+  const openSpotDetails = (spotId: number) => {
+    setDetailsSpotId(spotId);
+    setShowDetails(true);
+  };
+
+  const closeSpotDetails = () => {
+    setShowDetails(false);
+    setDetailsSpotId(null);
   };
 
   const handleReserveSpot = (spotId: number) => {
@@ -314,7 +383,7 @@ const App: React.FC = () => {
       <div className="login-container">
         <div className="login-card">
           <div className="login-header">
-            <div className="app-icon">🚗</div>
+            <div className="app-icon">G</div>
             <h1>GotSpot Gdansk</h1>
             <p>Smart Parking Solution • Private Demo</p>
           </div>
@@ -470,33 +539,35 @@ const App: React.FC = () => {
             </button>
           </div>
 
-          {/* Filter Tabs */}
-          <div className="filter-tabs">
-            <button
-              className={`filter-tab ${selectedFilter === 'all' ? 'active' : ''}`}
-              onClick={() => setSelectedFilter('all')}
-            >
-              All ({nearbySpots.length})
-            </button>
-            <button
-              className={`filter-tab ${selectedFilter === 'mall' ? 'active' : ''}`}
-              onClick={() => setSelectedFilter('mall')}
-            >
-              Shopping ({nearbySpots.filter((s: ParkingSpot) => s.type === 'mall').length})
-            </button>
-            <button
-              className={`filter-tab ${selectedFilter === 'university' ? 'active' : ''}`}
-              onClick={() => setSelectedFilter('university')}
-            >
-              Education ({nearbySpots.filter((s: ParkingSpot) => s.type === 'university').length})
-            </button>
-            <button
-              className={`filter-tab ${selectedFilter === 'street' ? 'active' : ''}`}
-              onClick={() => setSelectedFilter('street')}
-            >
-              Street ({nearbySpots.filter((s: ParkingSpot) => s.type === 'street').length})
-            </button>
-          </div>
+          {/* Filter Tabs - removed as per request */}
+          {false && (
+            <div className="filter-tabs">
+              <button
+                className={`filter-tab ${selectedFilter === 'all' ? 'active' : ''}`}
+                onClick={() => setSelectedFilter('all')}
+              >
+                All ({nearbySpots.length})
+              </button>
+              <button
+                className={`filter-tab ${selectedFilter === 'mall' ? 'active' : ''}`}
+                onClick={() => setSelectedFilter('mall')}
+              >
+                Shopping ({nearbySpots.filter((s: ParkingSpot) => s.type === 'mall').length})
+              </button>
+              <button
+                className={`filter-tab ${selectedFilter === 'university' ? 'active' : ''}`}
+                onClick={() => setSelectedFilter('university')}
+              >
+                Education ({nearbySpots.filter((s: ParkingSpot) => s.type === 'university').length})
+              </button>
+              <button
+                className={`filter-tab ${selectedFilter === 'street' ? 'active' : ''}`}
+                onClick={() => setSelectedFilter('street')}
+              >
+                Street ({nearbySpots.filter((s: ParkingSpot) => s.type === 'street').length})
+              </button>
+            </div>
+          )}
 
           {/* Map View */}
           {viewMode === 'map' && (
@@ -510,13 +581,13 @@ const App: React.FC = () => {
             </div>
           )}
           
-          {/* List View - UPDATED: Simplified with price categories */}
+          {/* List View - UPDATED: Simplified with price categories and click opens details */}
           {viewMode === 'list' && (
             <div className="spots-list">
               {getFilteredSpots().map(spot => {
                 const priceInfo = getPriceCategory(spot.price);
                 return (
-                  <div key={spot.id} className="spot-card" onClick={() => handleSpotSelect(spot.id)}>
+                  <div key={spot.id} className="spot-card" onClick={() => openSpotDetails(spot.id)}>
                     <div className="spot-header">
                       <div className="spot-info">
                         <span className="spot-icon">{getSpotIcon(spot.type)}</span>
@@ -542,18 +613,18 @@ const App: React.FC = () => {
                     </div>
                     
                     {/* Price Category Badge */}
-                    <div className="price-category-badge" style={{ 
-                      backgroundColor: priceInfo.bgColor, 
-                      color: priceInfo.color,
-                      border: `1px solid ${priceInfo.color}`
-                    }}>
-                      💰 {priceInfo.category} • {spot.price}
-                    </div>
+                                          <div className="price-category-badge" style={{
+                        backgroundColor: priceInfo.bgColor,
+                        color: priceInfo.color,
+                        border: `1px solid ${priceInfo.color}`
+                      }}>
+                        {priceInfo.category} • {spot.price}
+                      </div>
                     
-                    {/* Click to view details hint */}
-                    <div className="click-hint">
-                      👆 Click to view full details
-                    </div>
+                                          {/* Click to view details hint */}
+                      <div className="click-hint">
+                        Click to view full details
+                      </div>
                   </div>
                 );
               })}
@@ -581,6 +652,56 @@ const App: React.FC = () => {
               <div className="stat-number">Real-time</div>
               <div className="stat-label">Updates</div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Spot Details Modal */}
+      {showDetails && detailsSpotId && (
+        <div className="modal-overlay" onClick={closeSpotDetails}>
+          <div className="details-modal" onClick={(e) => e.stopPropagation()}>
+            {(() => {
+              const spot = allParkingSpots.find(s => s.id === detailsSpotId)!;
+              const priceInfo = getPriceCategory(spot.price);
+              return (
+                <>
+                  <div className="details-header">
+                    <h3>{spot.name}</h3>
+                    <button className="close-button" onClick={closeSpotDetails}>✕</button>
+                  </div>
+                  {spot.images && spot.images.length > 0 && (
+                    <div className="details-gallery">
+                      {spot.images.slice(0,3).map((src, idx) => (
+                        <img key={idx} src={src} alt={`${spot.name} ${idx+1}`} />
+                      ))}
+                    </div>
+                  )}
+                  <div className="details-meta">
+                    <span className="spot-type">{getTypeLabel(spot.type)}</span>
+                    {spot.distance && <span className="meta-pill">{spot.distance.toFixed(1)} km away</span>}
+                    <span className="meta-pill">{spot.rating} ★</span>
+                    <span className="meta-pill">Updated {spot.lastUpdated}</span>
+                  </div>
+                  <div className="details-address">{spot.address}</div>
+                  <div className="details-price">
+                    <div className="price-category-badge" style={{ 
+                      backgroundColor: priceInfo.bgColor, color: priceInfo.color, border: `1px solid ${priceInfo.color}`
+                    }}>
+                      {priceInfo.category} • {spot.price}
+                    </div>
+                    <div className="availability-inline">
+                      <span className="availability-number" style={{ color: getAvailabilityColor(spot.available) }}>{spot.available}</span>
+                      <span className="availability-total">of {spot.total} available</span>
+                    </div>
+                  </div>
+                  <div className="details-features">
+                    {spot.features.map((f, i) => (
+                      <span key={i} className="feature-tag">{f}</span>
+                    ))}
+                  </div>
+                </>
+              );
+            })()}
           </div>
         </div>
       )}

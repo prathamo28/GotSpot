@@ -226,15 +226,8 @@ const Map: React.FC<MapProps> = ({
   };
 
   const getSpotIcon = (type: string) => {
-    switch(type) {
-      case 'mall': return '🏬';
-      case 'office': return '🏢';
-      case 'street': return '🛣️';
-      case 'university': return '🎓';
-      case 'hospital': return '🏥';
-      case 'attraction': return '🎡';
-      default: return '🅿️';
-    }
+    // Return empty string for professional look
+    return '';
   };
 
   const getMarkerIcon = (type: string) => {
@@ -254,7 +247,7 @@ const Map: React.FC<MapProps> = ({
     return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
       <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
         <circle cx="16" cy="16" r="14" fill="${color}" stroke="white" stroke-width="2"/>
-        <text x="16" y="20" text-anchor="middle" font-size="16" fill="white" font-weight="bold">🅿️</text>
+        <text x="16" y="20" text-anchor="middle" font-size="16" fill="white" font-weight="bold">P</text>
       </svg>
     `)}`;
   };
