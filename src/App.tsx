@@ -585,15 +585,8 @@ const App: React.FC = () => {
         return [];
       }
     };
-      } catch (error) {
-        console.error('💥 Error with Places API:', error);
-        return [];
-      }
-    } catch (error) {
-      console.error('💥 Error fetching real parking spots:', error);
-      return [];
-    }
   };
+
 
   const findNearbyParking = async () => {
     if (!destination.trim()) return;
