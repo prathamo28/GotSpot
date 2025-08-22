@@ -273,7 +273,7 @@ const App: React.FC = () => {
             <Map 
               parkingSpots={nearbySpots}
               userLocation={userLocation}
-              onSpotClick={openSpotDetails}
+              onSpotSelect={openSpotDetails}
             />
           )}
         </>

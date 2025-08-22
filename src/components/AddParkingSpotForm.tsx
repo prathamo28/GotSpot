@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { ParkingSpot } from '../types/ParkingSpot';
 
 interface AddParkingSpotFormProps {
-  onSubmit: (spot: Omit<any, 'id'>) => void;
+  onSubmit: (spot: Omit<ParkingSpot, 'id'>) => void;
   onCancel: () => void;
   userLocation: { lat: number; lng: number } | null;
 }

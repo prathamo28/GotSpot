@@ -1,17 +1,8 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
+import { ParkingSpot } from '../types/ParkingSpot';
 
 interface MapProps {
-  parkingSpots: Array<{
-    id: number;
-    name: string;
-    address: string;
-    coordinates: { lat: number; lng: number };
-    available: number;
-    total: number;
-    price: string;
-    type: string;
-    rating: number;
-  }>;
+  parkingSpots: ParkingSpot[];
   selectedSpot?: number | null;
   onSpotSelect?: (spotId: number) => void;
   userLocation?: { lat: number; lng: number } | null;
@@ -118,6 +109,11 @@ const Map: React.FC<MapProps> = ({
         // Close all other info windows first
         newInfoWindows.forEach(iw => iw.close());
         infoWindow.open(mapInstance, marker);
+        
+        // Call onSpotSelect if provided
+        if (onSpotSelect) {
+          onSpotSelect(spot.id);
+        }
       });
 
       newMarkers.push(marker);
@@ -174,22 +170,21 @@ const Map: React.FC<MapProps> = ({
         </div>
         
                  <div style="display: flex; gap: 8px;">
-           <button 
-             onclick="window.selectSpot(${spot.id})"
+           <div 
              style="
                background: #2563eb; 
                color: white; 
                border: none; 
                padding: 8px 16px; 
                border-radius: 6px; 
-               cursor: pointer;
                font-size: 14px;
                font-weight: 500;
                flex: 1;
+               text-align: center;
              "
            >
-             View Details
-           </button>
+             Click marker for details
+           </div>
            {/* Reserve button commented out - not needed for current demo */}
            {/*
            <button 
