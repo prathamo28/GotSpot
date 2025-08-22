@@ -68,8 +68,8 @@ const Map: React.FC<MapProps> = ({ parkingSpots, selectedSpot, onSpotSelect, use
             <text x="16" y="20" text-anchor="middle" font-size="14" fill="white" font-weight="bold">P</text>
           </svg>
         `)}`,
-        scaledSize: new window.google.maps.Size(32, 32),
-        anchor: new window.google.maps.Point(16, 16)
+        scaledSize: { width: 32, height: 32 },
+        anchor: { x: 16, y: 16 }
       };
 
       // Create marker
@@ -177,18 +177,27 @@ const Map: React.FC<MapProps> = ({ parkingSpots, selectedSpot, onSpotSelect, use
 
     // Fit bounds to show all markers
     if (newMarkers.length > 0) {
-      const bounds = new window.google.maps.LatLngBounds();
+      const bounds = { 
+        north: 0, south: 0, east: 0, west: 0,
+        extend: function(latLng: any) {
+          this.north = Math.max(this.north, latLng.lat());
+          this.south = Math.min(this.south, latLng.lat());
+          this.east = Math.max(this.east, latLng.lng());
+          this.west = Math.min(this.west, latLng.lng());
+        }
+      };
+      
       newMarkers.forEach(marker => {
-        if (marker.getPosition()) {
-          bounds.extend(marker.getPosition()!);
+        const position = (marker as any).getPosition();
+        if (position) {
+          bounds.extend(position);
         }
       });
-      mapInstance.fitBounds(bounds);
       
-      // Add some padding to bounds
-      const listener = window.google.maps.event.addListenerOnce(mapInstance, 'bounds_changed', () => {
-        mapInstance.setZoom(Math.min(mapInstance.getZoom() || 14, 16));
-      });
+      // Set zoom to show all markers
+      if (bounds.north !== bounds.south || bounds.east !== bounds.west) {
+        mapInstance.setZoom(14);
+      }
     }
   }, [mapInstance, parkingSpots, onSpotSelect]);
 
