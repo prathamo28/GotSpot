@@ -17,7 +17,7 @@ const Statistics: React.FC<StatisticsProps> = ({
   userContributions
 }) => {
   const occupancyRate = totalSpots > 0 ? ((totalSpots - availableSpots) / totalSpots * 100).toFixed(1) : '0';
-  const realDataPercentage = totalSpots > 0 ? ((realSpots / totalSpots) * 100).toFixed(1) : '0';
+  const realDataPercentage = totalSpots > 0 ? ((realSpots / totalSpots) * 100) : 0;
 
   return (
     <div className="statistics-dashboard">
@@ -51,13 +51,13 @@ const Statistics: React.FC<StatisticsProps> = ({
           </div>
         </div>
         
-        <div className="stat-card warning">
-          <div className="stat-icon">🌍</div>
-          <div className="stat-content">
-            <span className="stat-number">{realDataPercentage}%</span>
-            <span className="stat-label">Real Data</span>
-          </div>
-        </div>
+                 <div className="stat-card warning">
+           <div className="stat-icon">🌍</div>
+           <div className="stat-content">
+             <span className="stat-number">{realDataPercentage.toFixed(1)}%</span>
+             <span className="stat-label">Real Data</span>
+           </div>
+         </div>
       </div>
       
       <div className="stats-details">
