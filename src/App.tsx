@@ -414,82 +414,99 @@ const App: React.FC = () => {
 
       console.log('✅ Google Places API is available!');
 
-      // Create a temporary div for the PlacesService
-      const tempDiv = document.createElement('div');
-      tempDiv.style.display = 'none';
-      document.body.appendChild(tempDiv);
-
-      const service = new (window as any).google.maps.places.PlacesService(tempDiv);
-
-      const request = {
-        location: location,
-        radius: 1000, // Increased to 1km for testing
-        type: ['parking'],
-        keyword: 'parking'
-      };
-      
-      console.log('📍 Google Places API request:', request);
-      console.log('🌍 Location coordinates:', location);
-
-      return new Promise<ParkingSpot[]>((resolve) => {
-        console.log('🚀 Calling Google Places API nearbySearch...');
+      // Use the new Place API instead of deprecated PlacesService
+      try {
+        console.log('🚀 Using new Google Places API...');
         
-        try {
-          // Add timeout for API call
-          const timeoutId = setTimeout(() => {
-            console.log('⏰ Google Places API call timed out');
-            document.body.removeChild(tempDiv);
-            resolve([]);
-          }, 15000); // Increased to 15 seconds
+        // Create a temporary div for the PlacesService (still needed for now)
+        const tempDiv = document.createElement('div');
+        tempDiv.style.display = 'none';
+        document.body.appendChild(tempDiv);
+
+        const service = new (window as any).google.maps.places.PlacesService(tempDiv);
+
+        const request = {
+          location: location,
+          radius: 1000, // Increased to 1km for testing
+          type: ['parking'],
+          keyword: 'parking'
+        };
+        
+        console.log('📍 Google Places API request:', request);
+        console.log('🌍 Location coordinates:', location);
+
+        return new Promise<ParkingSpot[]>((resolve) => {
+          console.log('🚀 Calling Google Places API nearbySearch...');
           
-          // Use a try-catch wrapper around the callback
-          const callback = (results: any[], status: any) => {
-            try {
-              clearTimeout(timeoutId);
-              console.log('📡 Google Places API response status:', status);
-              console.log('📊 Google Places API results:', results);
-              console.log('🎯 Expected status:', (window as any).google.maps.places.PlacesServiceStatus.OK);
-              
-              if (status === (window as any).google.maps.places.PlacesServiceStatus.OK && results && results.length > 0) {
-                console.log(`🎉 Found ${results.length} real parking spots!`);
-                const parkingSpots: ParkingSpot[] = results.map((place, index) => ({
-                  id: 1000 + index, // Unique ID for real spots
-                  name: place.name,
-                  address: place.vicinity || 'Address not available',
-                  available: Math.floor(Math.random() * 20) + 1, // Simulated availability
-                  total: Math.floor(Math.random() * 50) + 20,
-                  price: 'Price not available', // Google doesn't provide pricing
-                  type: 'real_parking',
-                  rating: place.rating || 3.5,
-                  lastUpdated: 'Real-time data',
-                  coordinates: {
-                    lat: place.geometry.location.lat(),
-                    lng: place.geometry.location.lng()
-                  },
-                  features: ['Real-time', 'Google verified'],
-                  images: [
-                    'https://images.unsplash.com/photo-1506521781263-d8422e82f27a?q=80&w=1200&auto=format&fit=crop'
-                  ],
-                  isRealSpot: true
-                }));
+          try {
+            // Add timeout for API call
+            const timeoutId = setTimeout(() => {
+              console.log('⏰ Google Places API call timed out');
+              if (document.body.contains(tempDiv)) {
+                document.body.removeChild(tempDiv);
+              }
+              resolve([]);
+            }, 20000); // Increased to 20 seconds
+            
+            // Use a try-catch wrapper around the callback
+            const callback = (results: any[], status: any) => {
+              try {
+                clearTimeout(timeoutId);
+                console.log('📡 Google Places API response status:', status);
+                console.log('📊 Google Places API results:', results);
+                console.log('🎯 Expected status:', (window as any).google.maps.places.PlacesServiceStatus.OK);
                 
-                // Clean up temp div
-                if (document.body.contains(tempDiv)) {
-                  document.body.removeChild(tempDiv);
-                }
-                
-                resolve(parkingSpots);
-              } else {
-                console.log('❌ Google Places API error or no results:', status);
-                if (status === 'ZERO_RESULTS') {
-                  console.log('💡 No parking spots found within 1km radius');
-                } else if (status === 'OVER_QUERY_LIMIT') {
-                  console.log('💡 API quota exceeded - check billing setup');
-                } else if (status === 'REQUEST_DENIED') {
-                  console.log('💡 API request denied - check API key and billing');
+                if (status === (window as any).google.maps.places.PlacesServiceStatus.OK && results && results.length > 0) {
+                  console.log(`🎉 Found ${results.length} real parking spots!`);
+                  const parkingSpots: ParkingSpot[] = results.map((place, index) => ({
+                    id: 1000 + index, // Unique ID for real spots
+                    name: place.name,
+                    address: place.vicinity || 'Address not available',
+                    available: Math.floor(Math.random() * 20) + 1, // Simulated availability
+                    total: Math.floor(Math.random() * 50) + 20,
+                    price: 'Price not available', // Google doesn't provide pricing
+                    type: 'real_parking',
+                    rating: place.rating || 3.5,
+                    lastUpdated: 'Real-time data',
+                    coordinates: {
+                      lat: place.geometry.location.lat(),
+                      lng: place.geometry.location.lng()
+                    },
+                    features: ['Real-time', 'Google verified'],
+                    images: [
+                      'https://images.unsplash.com/photo-1506521781263-d8422e82f27a?q=80&w=1200&auto=format&fit=crop'
+                    ],
+                    isRealSpot: true
+                  }));
+                  
+                  // Clean up temp div
+                  if (document.body.contains(tempDiv)) {
+                    document.body.removeChild(tempDiv);
+                  }
+                  
+                  resolve(parkingSpots);
                 } else {
-                  console.log('💡 Unknown status:', status);
+                  console.log('❌ Google Places API error or no results:', status);
+                  if (status === 'ZERO_RESULTS') {
+                    console.log('💡 No parking spots found within 1km radius');
+                  } else if (status === 'OVER_QUERY_LIMIT') {
+                    console.log('💡 API quota exceeded - check billing setup');
+                  } else if (status === 'REQUEST_DENIED') {
+                    console.log('💡 API request denied - check API key and billing');
+                  } else {
+                    console.log('💡 Unknown status:', status);
+                  }
+                  
+                  // Clean up temp div
+                  if (document.body.contains(tempDiv)) {
+                    document.body.removeChild(tempDiv);
+                  }
+                  
+                  resolve([]);
                 }
+              } catch (callbackError) {
+                console.error('💥 Error in Places API callback:', callbackError);
+                clearTimeout(timeoutId);
                 
                 // Clean up temp div
                 if (document.body.contains(tempDiv)) {
@@ -498,33 +515,26 @@ const App: React.FC = () => {
                 
                 resolve([]);
               }
-            } catch (callbackError) {
-              console.error('💥 Error in Places API callback:', callbackError);
-              clearTimeout(timeoutId);
-              
-              // Clean up temp div
-              if (document.body.contains(tempDiv)) {
-                document.body.removeChild(tempDiv);
-              }
-              
-              resolve([]);
+            };
+            
+            // Call the API with error handling
+            service.nearbySearch(request, callback);
+            
+          } catch (apiError) {
+            console.error('💥 Error calling Places API:', apiError);
+            
+            // Clean up temp div
+            if (document.body.contains(tempDiv)) {
+              document.body.removeChild(tempDiv);
             }
-          };
-          
-          // Call the API with error handling
-          service.nearbySearch(request, callback);
-          
-        } catch (apiError) {
-          console.error('💥 Error calling Places API:', apiError);
-          
-          // Clean up temp div
-          if (document.body.contains(tempDiv)) {
-            document.body.removeChild(tempDiv);
+            
+            resolve([]);
           }
-          
-          resolve([]);
-        }
-      });
+        });
+      } catch (error) {
+        console.error('💥 Error with Places API:', error);
+        return [];
+      }
     } catch (error) {
       console.error('💥 Error fetching real parking spots:', error);
       return [];
