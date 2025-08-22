@@ -424,6 +424,14 @@ const App: React.FC = () => {
         document.body.appendChild(tempDiv);
 
         const service = new (window as any).google.maps.places.PlacesService(tempDiv);
+        
+        // Try alternative method first - textSearch instead of nearbySearch
+        console.log('🔍 Trying textSearch method first...');
+        const textRequest = {
+          query: 'parking',
+          location: location,
+          radius: 1000
+        };
 
         const request = {
           location: location,
@@ -436,7 +444,7 @@ const App: React.FC = () => {
         console.log('🌍 Location coordinates:', location);
 
         return new Promise<ParkingSpot[]>((resolve) => {
-          console.log('🚀 Calling Google Places API nearbySearch...');
+          console.log('🚀 Trying textSearch method first...');
           
           try {
             // Add timeout for API call
@@ -448,16 +456,15 @@ const App: React.FC = () => {
               resolve([]);
             }, 20000); // Increased to 20 seconds
             
-            // Use a try-catch wrapper around the callback
+            // Define both callbacks first
             const callback = (results: any[], status: any) => {
               try {
                 clearTimeout(timeoutId);
-                console.log('📡 Google Places API response status:', status);
-                console.log('📊 Google Places API results:', results);
-                console.log('🎯 Expected status:', (window as any).google.maps.places.PlacesServiceStatus.OK);
+                console.log('📡 Google Places API nearbySearch response status:', status);
+                console.log('📊 Google Places API nearbySearch results:', results);
                 
                 if (status === (window as any).google.maps.places.PlacesServiceStatus.OK && results && results.length > 0) {
-                  console.log(`🎉 Found ${results.length} real parking spots!`);
+                  console.log(`🎉 Found ${results.length} real parking spots with nearbySearch!`);
                   const parkingSpots: ParkingSpot[] = results.map((place, index) => ({
                     id: 1000 + index, // Unique ID for real spots
                     name: place.name,
@@ -486,26 +493,14 @@ const App: React.FC = () => {
                   
                   resolve(parkingSpots);
                 } else {
-                  console.log('❌ Google Places API error or no results:', status);
-                  if (status === 'ZERO_RESULTS') {
-                    console.log('💡 No parking spots found within 1km radius');
-                  } else if (status === 'OVER_QUERY_LIMIT') {
-                    console.log('💡 API quota exceeded - check billing setup');
-                  } else if (status === 'REQUEST_DENIED') {
-                    console.log('💡 API request denied - check API key and billing');
-                  } else {
-                    console.log('💡 Unknown status:', status);
-                  }
-                  
-                  // Clean up temp div
+                  console.log('❌ Both textSearch and nearbySearch failed');
                   if (document.body.contains(tempDiv)) {
                     document.body.removeChild(tempDiv);
                   }
-                  
                   resolve([]);
                 }
               } catch (callbackError) {
-                console.error('💥 Error in Places API callback:', callbackError);
+                console.error('💥 Error in nearbySearch callback:', callbackError);
                 clearTimeout(timeoutId);
                 
                 // Clean up temp div
@@ -517,8 +512,89 @@ const App: React.FC = () => {
               }
             };
             
-            // Call the API with error handling
-            service.nearbySearch(request, callback);
+            // Try textSearch first (more reliable than nearbySearch)
+            const textCallback = (results: any[], status: any) => {
+              try {
+                clearTimeout(timeoutId);
+                console.log('📡 Google Places API textSearch response status:', status);
+                console.log('📊 Google Places API textSearch results:', results);
+                
+                if (status === (window as any).google.maps.places.PlacesServiceStatus.OK && results && results.length > 0) {
+                  console.log(`🎉 Found ${results.length} real parking spots with textSearch!`);
+                  const parkingSpots: ParkingSpot[] = results.map((place, index) => ({
+                    id: 1000 + index, // Unique ID for real spots
+                    name: place.name,
+                    address: place.vicinity || 'Address not available',
+                    available: Math.floor(Math.random() * 20) + 1, // Simulated availability
+                    total: Math.floor(Math.random() * 50) + 20,
+                    price: 'Price not available', // Google doesn't provide pricing
+                    type: 'real_parking',
+                    rating: place.rating || 3.5,
+                    lastUpdated: 'Real-time data',
+                    coordinates: {
+                      lat: place.geometry.location.lat(),
+                      lng: place.geometry.location.lng()
+                    },
+                    features: ['Real-time', 'Google verified'],
+                    images: [
+                      'https://images.unsplash.com/photo-1506521781263-d8422e82f27a?q=80&w=1200&auto=format&fit=crop'
+                    ],
+                    isRealSpot: true
+                  }));
+                  
+                  // Clean up temp div
+                  if (document.body.contains(tempDiv)) {
+                    document.body.removeChild(tempDiv);
+                  }
+                  
+                  resolve(parkingSpots);
+                  return; // Exit early if textSearch succeeds
+                } else {
+                  console.log('⚠️ textSearch failed, trying nearbySearch...');
+                  // Fallback to nearbySearch
+                  try {
+                    service.nearbySearch(request, callback);
+                  } catch (fallbackError) {
+                    console.error('💥 Fallback nearbySearch also failed:', fallbackError);
+                    if (document.body.contains(tempDiv)) {
+                      document.body.removeChild(tempDiv);
+                    }
+                    resolve([]);
+                  }
+                }
+              } catch (textError) {
+                console.error('💥 Error in textSearch callback:', textError);
+                // Try nearbySearch as fallback
+                try {
+                  service.nearbySearch(request, callback);
+                } catch (fallbackError) {
+                  console.error('💥 Fallback nearbySearch also failed:', fallbackError);
+                  if (document.body.contains(tempDiv)) {
+                    document.body.removeChild(tempDiv);
+                  }
+                  resolve([]);
+                }
+              }
+            };
+            
+            // Try textSearch first
+            try {
+              service.textSearch(textRequest, textCallback);
+            } catch (textSearchError) {
+              console.error('💥 textSearch failed, trying nearbySearch:', textSearchError);
+              // Fallback to nearbySearch
+              try {
+                service.nearbySearch(request, callback);
+              } catch (fallbackError) {
+                console.error('💥 Fallback nearbySearch also failed:', fallbackError);
+                if (document.body.contains(tempDiv)) {
+                  document.body.removeChild(tempDiv);
+                }
+                resolve([]);
+              }
+            }
+            
+            
             
           } catch (apiError) {
             console.error('💥 Error calling Places API:', apiError);

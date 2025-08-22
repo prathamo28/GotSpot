@@ -53,7 +53,7 @@ const Map: React.FC<MapProps> = ({
           // Cost optimization: Use simplified map styles
           styles: [
             {
-              featureType: 'poi.parking',
+              featureType: 'poi',
               elementType: 'labels',
               stylers: [{ visibility: 'on' }]
             },
