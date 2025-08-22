@@ -586,7 +586,6 @@ const App: React.FC = () => {
       }
     };
   };
-};
 
 
   const findNearbyParking = async () => {
