@@ -183,40 +183,43 @@ const Map: React.FC<MapProps> = ({
           </div>
         </div>
         
-        <div style="display: flex; gap: 8px;">
-          <button 
-            onclick="window.selectSpot(${spot.id})"
-            style="
-              background: #2563eb; 
-              color: white; 
-              border: none; 
-              padding: 8px 16px; 
-              border-radius: 6px; 
-              cursor: pointer;
-              font-size: 14px;
-              font-weight: 500;
-              flex: 1;
-            "
-          >
-            🗺️ View Details
-          </button>
-          <button 
-            onclick="window.reserveSpot(${spot.id})"
-            style="
-              background: white; 
-              color: #2563eb; 
-              border: 1px solid #2563eb; 
-              padding: 8px 16px; 
-              border-radius: 6px; 
-              cursor: pointer;
-              font-size: 14px;
-              font-weight: 500;
-              flex: 1;
-            "
-          >
-            💳 Reserve Now
-          </button>
-        </div>
+                 <div style="display: flex; gap: 8px;">
+           <button 
+             onclick="window.selectSpot(${spot.id})"
+             style="
+               background: #2563eb; 
+               color: white; 
+               border: none; 
+               padding: 8px 16px; 
+               border-radius: 6px; 
+               cursor: pointer;
+               font-size: 14px;
+               font-weight: 500;
+               flex: 1;
+             "
+           >
+             View Details
+           </button>
+           {/* Reserve button commented out - not needed for current demo */}
+           {/*
+           <button 
+             onclick="window.reserveSpot(${spot.id})"
+             style="
+               background: white; 
+               color: #2563eb; 
+               border: 1px solid #2563eb; 
+               padding: 8px 16px; 
+               border-radius: 6px; 
+               cursor: pointer;
+               font-size: 14px;
+               font-weight: 500;
+               flex: 1;
+             "
+           >
+             Reserve Now
+           </button>
+           */}
+         </div>
         
         <div style="margin-top: 10px; padding: 8px; background: #eff6ff; border-radius: 6px; text-align: center;">
           <span style="color: #1e40af; font-size: 12px;">🚀 Pilot Project - Real-time Data</span>
@@ -295,20 +298,23 @@ const Map: React.FC<MapProps> = ({
     }
   }, [selectedSpot, map, markers, parkingSpots]);
 
-  // Expose functions globally for info window buttons
-  useEffect(() => {
-    (window as any).selectSpot = (spotId: number) => {
-      if (onSpotSelect) {
-        onSpotSelect(spotId);
-      }
-    };
-    
-    (window as any).reserveSpot = (spotId: number) => {
-      if (onSpotSelect) {
-        onSpotSelect(spotId);
-      }
-    };
-  }, [onSpotSelect]);
+     // Expose functions globally for info window buttons
+   useEffect(() => {
+     (window as any).selectSpot = (spotId: number) => {
+       if (onSpotSelect) {
+         onSpotSelect(spotId);
+       }
+     };
+     
+     {/* Reserve function commented out - not needed for current demo */}
+     {/*
+     (window as any).reserveSpot = (spotId: number) => {
+       if (onSpotSelect) {
+         onSpotSelect(spotId);
+       }
+     };
+     */}
+   }, [onSpotSelect]);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -318,67 +324,67 @@ const Map: React.FC<MapProps> = ({
     };
   }, [infoWindows]);
 
-  if (mapError) {
-    return (
-      <div className="map-error">
-        <div className="error-content">
-          <div className="error-icon">⚠️</div>
-          <h3>Map Loading Error</h3>
-          <p>{mapError}</p>
-          <button onClick={() => {
-            setMapError(null);
-            setIsMapLoaded(false);
-            initMap();
-          }} className="retry-button">
-            🔄 Retry
-          </button>
-        </div>
-      </div>
-    );
-  }
+     if (mapError) {
+     return (
+       <div className="map-error">
+         <div className="error-content">
+           <div className="error-icon">!</div>
+           <h3>Map Loading Error</h3>
+           <p>{mapError}</p>
+           <button onClick={() => {
+             setMapError(null);
+             setIsMapLoaded(false);
+             initMap();
+           }} className="retry-button">
+             Retry
+           </button>
+         </div>
+       </div>
+     );
+   }
 
   return (
     <div className="map-container">
       <div ref={mapRef} className="map" style={{ width: '100%', height: '400px' }} />
       
-      {/* Map Controls */}
-      <div className="map-controls">
-        <button 
-          className="map-control-btn"
-          onClick={() => map?.setZoom((map.getZoom() || 12) + 1)}
-          title="Zoom In"
-        >
-          ➕
-        </button>
-        <button 
-          className="map-control-btn"
-          onClick={() => map?.setZoom((map.getZoom() || 12) - 1)}
-          title="Zoom Out"
-        >
-          ➖
-        </button>
-        {userLocation && (
-          <button 
-            className="map-control-btn"
-            onClick={() => map?.panTo(userLocation)}
-            title="Center on my location"
-          >
-            📍
-          </button>
-        )}
-        <button 
-          className="map-control-btn"
-          onClick={() => map?.panTo({ lat: 54.3520, lng: 18.6466 })}
-          title="Center on Gdansk"
-        >
-          🏙️
-        </button>
-      </div>
+             {/* Map Controls */}
+       <div className="map-controls">
+         <button 
+           className="map-control-btn"
+           onClick={() => map?.setZoom((map.getZoom() || 12) + 1)}
+           title="Zoom In"
+         >
+           +
+         </button>
+         <button 
+           className="map-control-btn"
+           onClick={() => map?.setZoom((map.getZoom() || 12) - 1)}
+           title="Zoom Out"
+         >
+           -
+         </button>
+         {userLocation && (
+           <button 
+             className="map-control-btn"
+             onClick={() => map?.panTo(userLocation)}
+             title="Center on my location"
+           >
+             L
+           </button>
+         )}
+         <button 
+           className="map-control-btn"
+           onClick={() => map?.panTo({ lat: 54.3520, lng: 18.6466 })}
+           title="Center on Gdansk"
+         >
+           G
+         </button>
+       </div>
 
-      {/* Pilot Project Banner */}
-      <div className="pilot-banner">
-        <p>🚀 <strong>Pilot Project Active</strong> - Real-time parking data from Gdansk</p>
-      </div>
+             {/* Pilot Project Banner */}
+       <div className="pilot-banner">
+         <p><strong>Pilot Project Active</strong> - Real-time parking data from Gdansk</p>
+       </div>
     </div>
   );
 };
