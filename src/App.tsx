@@ -365,9 +365,20 @@ const App: React.FC = () => {
   const getRealParkingSpots = async (location: { lat: number; lng: number }) => {
     try {
       // Check if Google Maps API is loaded
+      console.log('Checking Google Maps API availability...');
+      console.log('window.google:', (window as any).google);
+      console.log('window.google.maps:', (window as any).google?.maps);
+      console.log('window.google.maps.places:', (window as any).google?.maps?.places);
+      
       if (!(window as any).google?.maps?.places) {
-        console.log('Google Places API not loaded yet');
-        return [];
+        console.log('Google Places API not loaded yet - waiting for API to load...');
+        // Wait a bit for API to load
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        if (!(window as any).google?.maps?.places) {
+          console.log('Google Places API still not available after waiting');
+          return [];
+        }
       }
 
       const service = new (window as any).google.maps.places.PlacesService(
@@ -380,10 +391,18 @@ const App: React.FC = () => {
         type: ['parking'],
         keyword: 'parking'
       };
+      
+      console.log('Google Places API request:', request);
+      console.log('Location coordinates:', location);
 
-      return new Promise((resolve) => {
-        service.nearbySearch(request, (results: any[], status: any) => {
-          if (status === (window as any).google.maps.places.PlacesServiceStatus.OK) {
+              return new Promise((resolve) => {
+          console.log('Calling Google Places API nearbySearch...');
+          service.nearbySearch(request, (results: any[], status: any) => {
+            console.log('Google Places API response status:', status);
+            console.log('Google Places API results:', results);
+            console.log('Expected status:', (window as any).google.maps.places.PlacesServiceStatus.OK);
+            
+            if (status === (window as any).google.maps.places.PlacesServiceStatus.OK) {
             const parkingSpots = results.map((place, index) => ({
               id: 1000 + index, // Unique ID for real spots
               name: place.name,
@@ -417,12 +436,12 @@ const App: React.FC = () => {
     }
   };
 
-  const findNearbyParking = () => {
+  const findNearbyParking = async () => {
     if (!destination.trim()) return;
     
     setLoading(true);
     
-    setTimeout(() => {
+    try {
       // Find destination coordinates
       const dest = popularDestinations.find(d => 
         d.name.toLowerCase().includes(destination.toLowerCase()) ||
@@ -447,10 +466,40 @@ const App: React.FC = () => {
           .sort((a, b) => (a.distance || 0) - (b.distance || 0));
       }
       
+      let realParkingSpots: ParkingSpot[] = [];
+      
+      if (dest) {
+        // Get real parking spots from Google Places API within 500m
+        realParkingSpots = await getRealParkingSpots(dest.coordinates);
+        console.log('Real parking spots found:', realParkingSpots.length);
+        
+        // Add real parking spots with distances
+        const realSpotsWithDistance = realParkingSpots.map(spot => ({
+          ...spot,
+          distance: calculateDistance(
+            dest.coordinates.lat,
+            dest.coordinates.lng,
+            spot.coordinates.lat,
+            spot.coordinates.lng
+          )
+        }));
+        
+        // Combine demo and real spots, sorted by distance
+        const allSpots = [...spotsWithDistance, ...realSpotsWithDistance];
+        spotsWithDistance = allSpots.sort((a, b) => (a.distance || 0) - (b.distance || 0));
+        
+        console.log('Total spots after combining:', spotsWithDistance.length);
+        console.log('Demo spots:', spotsWithDistance.length - realSpotsWithDistance.length);
+        console.log('Real spots:', realSpotsWithDistance.length);
+      }
+      
       setNearbySpots(spotsWithDistance);
       setShowResults(true);
       setLoading(false);
-    }, 1000);
+    } catch (error) {
+      console.error('Error finding parking:', error);
+      setLoading(false);
+    }
   };
 
   const getSpotIcon = (type: string) => {
