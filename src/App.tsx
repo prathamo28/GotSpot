@@ -83,61 +83,113 @@ const App: React.FC = () => {
     setPassword('');
   };
 
-  // Enhanced parking data for Gdansk with real coordinates
+  // Enhanced parking data for Gdansk with real coordinates - Organized by area
   const baseParkingSpots: ParkingSpot[] = [
+    // GDANSK OLD TOWN AREA (Historic Center)
     {
       id: 1,
-      name: "Galeria Przymorze Underground",
-      address: "Obrońców Wybrzeża 57, 80-398 Gdansk",
-      available: 45,
-      total: 800,
-      price: "2h free, then 3 PLN/h",
-      type: "mall",
-      rating: 4.5,
-      lastUpdated: "2 min ago",
-      coordinates: { lat: 54.4195, lng: 18.5706 },
-      features: ["Covered", "Security", "Shopping", "Restaurants"],
-      images: [
-        'https://images.unsplash.com/photo-1506521781263-d8422e82f27a?q=80&w=1200&auto=format&fit=crop',
-        'https://images.unsplash.com/photo-1531390820546-5d67b3b6b9df?q=80&w=1200&auto=format&fit=crop'
-      ]
-    },
-    {
-      id: 2,
-      name: "Olivia Centre Parking A",
-      address: "Al. Grunwaldzka 472, 80-309 Gdansk",
-      available: 12,
-      total: 200,
-      price: "15min free, then 4 PLN/h",
-      type: "office",
+      name: "Piastowska Street Parking",
+      address: "Piastowska, 80-332 Gdańsk",
+      available: 8,
+      total: 25,
+      price: "3 PLN/h, free after 18:00",
+      type: "street",
       rating: 4.2,
       lastUpdated: "1 min ago",
-      coordinates: { lat: 54.4156, lng: 18.5712 },
-      features: ["Business", "Security", "24/7", "EV Charging"],
-      images: [
-        'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?q=80&w=1200&auto=format&fit=crop'
-      ]
-    },
-    {
-      id: 3,
-      name: "Street Parking - Oliwa Center",
-      address: "ul. Cystersów, 80-462 Gdansk",
-      available: 3,
-      total: 15,
-      price: "Free weekends, 2.50 PLN/h weekdays",
-      type: "street",
-      rating: 3.8,
-      lastUpdated: "5 min ago",
-      coordinates: { lat: 54.4115, lng: 18.5601 },
-      features: ["Street", "Historic", "Tourism", "Free weekends"],
+      coordinates: { lat: 54.3520, lng: 18.6466 },
+      features: ["Historic", "Old Town", "Tourism", "Evening free"],
       images: [
         'https://images.unsplash.com/photo-1528909514045-2fa4ac7a08ba?q=80&w=1200&auto=format&fit=crop'
       ]
     },
     {
+      id: 2,
+      name: "Czerwony Dwór Parking Zone",
+      address: "Czerwony Dwór, 80-383 Gdańsk",
+      available: 15,
+      total: 40,
+      price: "2.50 PLN/h, 15 PLN/day",
+      type: "street",
+      rating: 4.0,
+      lastUpdated: "2 min ago",
+      coordinates: { lat: 54.3540, lng: 18.6480 },
+      features: ["Historic", "Old Town", "Daily rate", "Tourism"],
+      images: [
+        'https://images.unsplash.com/photo-1506521781263-d8422e82f27a?q=80&w=1200&auto=format&fit=crop'
+      ]
+    },
+    {
+      id: 3,
+      name: "Sambora Street Parking",
+      address: "Sambora, 80-361 Gdańsk",
+      available: 12,
+      total: 30,
+      price: "2 PLN/h, free weekends",
+      type: "street",
+      rating: 3.9,
+      lastUpdated: "3 min ago",
+      coordinates: { lat: 54.3530, lng: 18.6470 },
+      features: ["Historic", "Old Town", "Weekend free", "Tourism"],
+      images: [
+        'https://images.unsplash.com/photo-1494526585095-c41746248156?q=80&w=1200&auto=format&fit=crop'
+      ]
+    },
+    {
       id: 4,
+      name: "Plac Dworcowy Station Parking",
+      address: "Plac Dworcowy, 80-321 Gdańsk",
+      available: 45,
+      total: 120,
+      price: "4 PLN/h, 20 PLN/day",
+      type: "transport",
+      rating: 4.1,
+      lastUpdated: "1 min ago",
+      coordinates: { lat: 54.3550, lng: 18.6450 },
+      features: ["Train station", "Transport hub", "24/7", "Daily rate"],
+      images: [
+        'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?q=80&w=1200&auto=format&fit=crop'
+      ]
+    },
+    
+    // SHOPPING & BUSINESS AREAS
+    {
+      id: 5,
+      name: "Forum Gdansk Underground",
+      address: "Targ Sienny 1, 80-806 Gdańsk",
+      available: 34,
+      total: 600,
+      price: "2h free, then 4 PLN/h",
+      type: "mall",
+      rating: 4.6,
+      lastUpdated: "1 min ago",
+      coordinates: { lat: 54.3556, lng: 18.6494 },
+      features: ["Downtown", "Shopping", "Restaurants", "Historic center"],
+      images: [
+        'https://images.unsplash.com/photo-1494526585095-c41746248156?q=80&w=1200&auto=format&fit=crop'
+      ]
+    },
+    {
+      id: 6,
+      name: "Manhattan Shopping Center",
+      address: "Al. Grunwaldzka 82, 80-244 Gdańsk",
+      available: 89,
+      total: 400,
+      price: "1h free, then 3.50 PLN/h",
+      type: "mall",
+      rating: 4.3,
+      lastUpdated: "1 min ago",
+      coordinates: { lat: 54.3789, lng: 18.6078 },
+      features: ["Shopping", "Cinema", "Food court", "Family"],
+      images: [
+        'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1200&auto=format&fit=crop'
+      ]
+    },
+    
+    // EDUCATIONAL & MEDICAL AREAS
+    {
+      id: 7,
       name: "University of Gdansk - Main Campus",
-      address: "Jana Bażyńskiego 8, 80-309 Gdansk",
+      address: "Jana Bażyńskiego 8, 80-309 Gdańsk",
       available: 67,
       total: 300,
       price: "Students free, others 2 PLN/h",
@@ -151,25 +203,9 @@ const App: React.FC = () => {
       ]
     },
     {
-      id: 5,
-      name: "Manhattan Shopping Center",
-      address: "Al. Grunwaldzka 82, 80-244 Gdansk",
-      available: 89,
-      total: 400,
-      price: "1h free, then 3.50 PLN/h",
-      type: "mall",
-      rating: 4.3,
-      lastUpdated: "1 min ago",
-      coordinates: { lat: 54.3789, lng: 18.6078 },
-      features: ["Shopping", "Cinema", "Food court", "Family"],
-      images: [
-        'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1200&auto=format&fit=crop'
-      ]
-    },
-    {
-      id: 6,
+      id: 8,
       name: "Medical University of Gdansk",
-      address: "Marii Skłodowskiej-Curie 3a, 80-210 Gdansk",
+      address: "Marii Skłodowskiej-Curie 3a, 80-210 Gdańsk",
       available: 23,
       total: 150,
       price: "Patients free, visitors 2 PLN/h",
@@ -180,38 +216,6 @@ const App: React.FC = () => {
       features: ["Medical", "Patient priority", "Security", "24/7"],
       images: [
         'https://images.unsplash.com/photo-1586773860418-d37222d8fce3?q=80&w=1200&auto=format&fit=crop'
-      ]
-    },
-    {
-      id: 7,
-      name: "Gdansk Zoo Parking",
-      address: "Karwieńska 3, 80-328 Gdansk",
-      available: 156,
-      total: 500,
-      price: "Free with zoo ticket, 5 PLN/h without",
-      type: "attraction",
-      rating: 4.4,
-      lastUpdated: "2 min ago",
-      coordinates: { lat: 54.4147, lng: 18.5478 },
-      features: ["Family", "Nature", "Large capacity", "Weekend busy"],
-      images: [
-        'https://images.unsplash.com/photo-1469474968028-56623f02e42e?q=80&w=1200&auto=format&fit=crop'
-      ]
-    },
-    {
-      id: 8,
-      name: "Forum Gdansk Underground",
-      address: "Targ Sienny 1, 80-806 Gdansk",
-      available: 34,
-      total: 600,
-      price: "2h free, then 4 PLN/h",
-      type: "mall",
-      rating: 4.6,
-      lastUpdated: "1 min ago",
-      coordinates: { lat: 54.3556, lng: 18.6494 },
-      features: ["Downtown", "Shopping", "Restaurants", "Historic center"],
-      images: [
-        'https://images.unsplash.com/photo-1494526585095-c41746248156?q=80&w=1200&auto=format&fit=crop'
       ]
     }
   ];
@@ -257,12 +261,19 @@ const App: React.FC = () => {
   }, []);
 
   const popularDestinations = [
+    // GDANSK OLD TOWN AREA
+    { name: "Piastowska", category: "Old Town", coordinates: { lat: 54.3520, lng: 18.6466 } },
+    { name: "Czerwony Dwór", category: "Old Town", coordinates: { lat: 54.3540, lng: 18.6480 } },
+    { name: "Sambora", category: "Old Town", coordinates: { lat: 54.3530, lng: 18.6470 } },
+    { name: "Plac Dworcowy", category: "Transport", coordinates: { lat: 54.3550, lng: 18.6450 } },
+    
+    // SHOPPING & BUSINESS
+    { name: "Forum Gdansk", category: "Shopping", coordinates: { lat: 54.3556, lng: 18.6494 } },
+    { name: "Manhattan Shopping", category: "Shopping", coordinates: { lat: 54.3789, lng: 18.6078 } },
+    
+    // EDUCATIONAL & MEDICAL
     { name: "University of Gdansk", category: "Education", coordinates: { lat: 54.3963, lng: 18.5767 } },
-    { name: "Galeria Przymorze", category: "Shopping", coordinates: { lat: 54.4195, lng: 18.5706 } },
-    { name: "Olivia Centre", category: "Business", coordinates: { lat: 54.4156, lng: 18.5712 } },
-    { name: "Oliwa Cathedral", category: "Tourism", coordinates: { lat: 54.4115, lng: 18.5601 } },
-    { name: "Gdansk Zoo", category: "Attraction", coordinates: { lat: 54.4147, lng: 18.5478 } },
-    { name: "Forum Gdansk", category: "Shopping", coordinates: { lat: 54.3556, lng: 18.6494 } }
+    { name: "Medical University", category: "Medical", coordinates: { lat: 54.3614, lng: 18.6201 } }
   ];
 
   // Calculate distance between two points (Haversine formula)
@@ -411,16 +422,16 @@ const App: React.FC = () => {
             </button>
           </div>
 
-          <div className="demo-info">
-            <h3>🚀 Demo Features:</h3>
-            <ul>
-              <li>• 8 real Gdansk parking locations</li>
-              <li>• Interactive map with real-time updates</li>
-              <li>• Smart destination search & nearby parking</li>
-              <li>• Color-coded pricing system</li>
-              <li>• Professional investor-ready demo</li>
-            </ul>
-          </div>
+                     <div className="demo-info">
+             <h3>Demo Features:</h3>
+             <ul>
+               <li>• 4 real Gdansk Old Town street locations</li>
+               <li>• Interactive map with real-time updates</li>
+               <li>• Smart destination search & nearby parking</li>
+               <li>• Color-coded pricing system</li>
+               <li>• Professional investor-ready demo</li>
+             </ul>
+           </div>
         </div>
       </div>
     );
@@ -432,10 +443,10 @@ const App: React.FC = () => {
       {/* Header */}
       <div className="header">
         <div className="header-content">
-          <div>
-            <h1>🚗 GotSpot Gdansk</h1>
-            <p>Smart parking • Real-time availability • 8 locations</p>
-          </div>
+                     <div>
+             <h1>GotSpot Gdansk</h1>
+             <p>Smart parking • Real-time availability • Old Town focus</p>
+           </div>
           <button onClick={handleLogout} className="logout-button">
             🔒 Exit Demo
           </button>
@@ -452,14 +463,14 @@ const App: React.FC = () => {
         <div className="search-group">
           <label>Where are you going?</label>
           <div className="search-input-group">
-            <input
-              type="text"
-              placeholder="e.g., University of Gdansk, Galeria Przymorze..."
-              value={destination}
-              onChange={(e) => setDestination(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && findNearbyParking()}
-              disabled={loading}
-            />
+                         <input
+               type="text"
+               placeholder="e.g., Piastowska, Czerwony Dwór, Sambora, Plac Dworcowy..."
+               value={destination}
+               onChange={(e) => setDestination(e.target.value)}
+               onKeyPress={(e) => e.key === 'Enter' && findNearbyParking()}
+               disabled={loading}
+             />
             <button
               onClick={findNearbyParking}
               disabled={!destination.trim() || loading}
@@ -635,25 +646,25 @@ const App: React.FC = () => {
 
       {/* Empty state */}
       {!showResults && !loading && (
-        <div className="empty-state">
-          <div className="empty-icon">🎯</div>
-          <h3>Find Smart Parking in Gdansk</h3>
-          <p>Real-time availability • Interactive maps • Color-coded pricing</p>
-          <div className="stats-grid">
-            <div className="stat-item">
-              <div className="stat-number">8</div>
-              <div className="stat-label">Parking Locations</div>
-            </div>
-            <div className="stat-item">
-              <div className="stat-number">2,350+</div>
-              <div className="stat-label">Total Spots</div>
-            </div>
-            <div className="stat-item">
-              <div className="stat-number">Real-time</div>
-              <div className="stat-label">Updates</div>
-            </div>
-          </div>
-        </div>
+                 <div className="empty-state">
+           <div className="empty-icon">!</div>
+           <h3>Find Smart Parking in Gdansk Old Town</h3>
+           <p>Real-time availability • Interactive maps • Color-coded pricing</p>
+           <div className="stats-grid">
+             <div className="stat-item">
+               <div className="stat-number">4</div>
+               <div className="stat-label">Old Town Streets</div>
+             </div>
+             <div className="stat-item">
+               <div className="stat-number">215+</div>
+               <div className="stat-label">Total Spots</div>
+             </div>
+             <div className="stat-item">
+               <div className="stat-number">Real-time</div>
+               <div className="stat-label">Updates</div>
+             </div>
+           </div>
+         </div>
       )}
 
       {/* Spot Details Modal */}
