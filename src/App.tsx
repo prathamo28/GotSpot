@@ -278,6 +278,17 @@ const App: React.FC = () => {
     return labels[type] || type;
   };
 
+  // NEW: Get price category and color for parking spots
+  const getPriceCategory = (price: string) => {
+    // Extract hourly rate from price string
+    const hourlyRate = parseFloat(price.match(/(\d+(?:\.\d+)?)/)?.[1] || '0');
+    
+    if (hourlyRate === 0) return { category: 'Free', color: '#16a34a', bgColor: '#dcfce7' };
+    if (hourlyRate <= 2) return { category: 'Cheap', color: '#ca8a04', bgColor: '#fef3c7' };
+    if (hourlyRate <= 4) return { category: 'Moderate', color: '#ea580c', bgColor: '#fed7aa' };
+    return { category: 'Expensive', color: '#dc2626', bgColor: '#fee2e2' };
+  };
+
   const handleSpotSelect = (spotId: number) => {
     setSelectedSpot(spotId);
     if (viewMode === 'list') {
@@ -336,8 +347,8 @@ const App: React.FC = () => {
             <ul>
               <li>• 8 real Gdansk parking locations</li>
               <li>• Interactive map with real-time updates</li>
-              <li>• Smart destination search & navigation</li>
-              <li>• In-app payment & reservation system</li>
+              <li>• Smart destination search & nearby parking</li>
+              <li>• Color-coded pricing system</li>
               <li>• Professional investor-ready demo</li>
             </ul>
           </div>
@@ -390,7 +401,8 @@ const App: React.FC = () => {
           </div>
         </div>
 
-        {/* Quick Destinations */}
+        {/* Quick Destinations - COMMENTED OUT - Replaced with nearby search functionality */}
+        {/*
         <div className="quick-destinations">
           <p>Popular destinations:</p>
           <div className="destination-grid">
@@ -417,11 +429,13 @@ const App: React.FC = () => {
                 disabled={loading}
               >
                 <div className="destination-name">{dest.name}</div>
+                <div className="destination-name">{dest.name}</div>
                 <div className="destination-category">{dest.category}</div>
               </button>
             ))}
           </div>
         </div>
+        */}
       </div>
 
       {/* Loading State */}
@@ -496,65 +510,53 @@ const App: React.FC = () => {
             </div>
           )}
           
-          {/* List View */}
+          {/* List View - UPDATED: Simplified with price categories */}
           {viewMode === 'list' && (
             <div className="spots-list">
-              {getFilteredSpots().map(spot => (
-                <div key={spot.id} className="spot-card">
-                  <div className="spot-header">
-                    <div className="spot-info">
-                      <span className="spot-icon">{getSpotIcon(spot.type)}</span>
-                      <div>
-                        <h3>{spot.name}</h3>
-                        <p className="spot-address">{spot.address}</p>
-                        <div className="spot-meta">
-                          <span className="spot-type">{getTypeLabel(spot.type)}</span>
-                          <span>★ {spot.rating}</span>
-                          <span>• {spot.lastUpdated}</span>
-                          {spot.distance && (
-                            <span>• {spot.distance.toFixed(1)} km</span>
-                          )}
+              {getFilteredSpots().map(spot => {
+                const priceInfo = getPriceCategory(spot.price);
+                return (
+                  <div key={spot.id} className="spot-card" onClick={() => handleSpotSelect(spot.id)}>
+                    <div className="spot-header">
+                      <div className="spot-info">
+                        <span className="spot-icon">{getSpotIcon(spot.type)}</span>
+                        <div>
+                          <h3>{spot.name}</h3>
+                          <div className="spot-meta">
+                            <span className="spot-type">{getTypeLabel(spot.type)}</span>
+                            {spot.distance && (
+                              <span>• {spot.distance.toFixed(1)} km</span>
+                            )}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                    <div className="availability">
-                      <div 
-                        className="availability-number"
-                        style={{ color: getAvailabilityColor(spot.available) }}
-                      >
-                        {spot.available}
+                      <div className="availability">
+                        <div 
+                          className="availability-number"
+                          style={{ color: getAvailabilityColor(spot.available) }}
+                        >
+                          {spot.available}
+                        </div>
+                        <div className="availability-total">of {spot.total}</div>
                       </div>
-                      <div className="availability-total">of {spot.total}</div>
+                    </div>
+                    
+                    {/* Price Category Badge */}
+                    <div className="price-category-badge" style={{ 
+                      backgroundColor: priceInfo.bgColor, 
+                      color: priceInfo.color,
+                      border: `1px solid ${priceInfo.color}`
+                    }}>
+                      💰 {priceInfo.category} • {spot.price}
+                    </div>
+                    
+                    {/* Click to view details hint */}
+                    <div className="click-hint">
+                      👆 Click to view full details
                     </div>
                   </div>
-                  
-                  {/* Features */}
-                  <div className="spot-features">
-                    {spot.features.map((feature, index) => (
-                      <span key={index} className="feature-tag">{feature}</span>
-                    ))}
-                  </div>
-                  
-                  <div className="spot-details">
-                    <div className="spot-price">💰 {spot.price}</div>
-                    <div className="spot-actions">
-                      <button 
-                        className="navigate-button"
-                        onClick={() => handleSpotSelect(spot.id)}
-                      >
-                        🗺️ View on Map
-                      </button>
-                      <button 
-                        className="reserve-button"
-                        onClick={() => handleReserveSpot(spot.id)}
-                        disabled={spot.available === 0}
-                      >
-                        💳 Reserve & Pay
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
@@ -565,7 +567,7 @@ const App: React.FC = () => {
         <div className="empty-state">
           <div className="empty-icon">🎯</div>
           <h3>Find Smart Parking in Gdansk</h3>
-          <p>Real-time availability • Interactive maps • Easy payments</p>
+          <p>Real-time availability • Interactive maps • Color-coded pricing</p>
           <div className="stats-grid">
             <div className="stat-item">
               <div className="stat-number">8</div>
@@ -583,7 +585,8 @@ const App: React.FC = () => {
         </div>
       )}
 
-      {/* Payment Modal */}
+      {/* Payment Modal - COMMENTED OUT - Removed for now */}
+      {/*
       {showPayment && selectedSpot && (
         <div className="modal-overlay">
           <Payment
@@ -593,13 +596,16 @@ const App: React.FC = () => {
           />
         </div>
       )}
+      */}
 
-      {/* Reservations */}
+      {/* Reservations - COMMENTED OUT - Removed for now */}
+      {/*
       {reservations.length > 0 && (
         <div className="reservations-banner">
           <p>🎉 You have {reservations.length} active reservation(s)</p>
         </div>
       )}
+      */}
     </div>
   );
 };
