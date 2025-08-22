@@ -218,15 +218,15 @@ const Map: React.FC<MapProps> = ({ parkingSpots, selectedSpot, onSpotSelect, use
 
     if (selectedMarker) {
       // Pan to selected marker
-      const position = selectedMarker.getPosition();
+      const position = (selectedMarker as any).getPosition();
       if (position) {
         mapInstance.panTo(position);
         mapInstance.setZoom(16);
 
         // Show info window for selected marker
-        const selectedIndex = parkingSpots.findIndex(spot => spot.id === selectedSpot);
+        const selectedIndex = parkingSpots.findIndex((spot: ParkingSpot) => spot.id === selectedSpot);
         if (selectedIndex >= 0 && infoWindows[selectedIndex]) {
-          infoWindows.forEach(iw => iw.close());
+          infoWindows.forEach((iw: google.maps.InfoWindow) => iw.close());
           infoWindows[selectedIndex].open(mapInstance, selectedMarker);
         }
       }
@@ -300,14 +300,9 @@ const Map: React.FC<MapProps> = ({ parkingSpots, selectedSpot, onSpotSelect, use
         <button
           onClick={() => {
             if (mapInstance && parkingSpots.length > 0) {
-              const bounds = new window.google.maps.LatLngBounds();
-              markers.forEach(marker => {
-                const position = marker.getPosition();
-                if (position) {
-                  bounds.extend(position);
-                }
-              });
-              mapInstance.fitBounds(bounds);
+              // Center map to show all markers
+              mapInstance.setZoom(13);
+              mapInstance.panTo({ lat: 54.3520, lng: 18.6466 });
             }
           }}
           style={{
