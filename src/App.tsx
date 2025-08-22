@@ -489,8 +489,17 @@ const App: React.FC = () => {
       
       if (dest) {
         // Get real parking spots from Google Places API within 500m
+        console.log('🚀 Attempting to fetch real parking spots...');
         realParkingSpots = await getRealParkingSpots(dest.coordinates);
-        console.log('Real parking spots found:', realParkingSpots.length);
+        console.log('📊 Real parking spots found:', realParkingSpots.length);
+        
+        if (realParkingSpots.length === 0) {
+          console.log('⚠️ No real parking spots found - possible issues:');
+          console.log('   - Places API not enabled');
+          console.log('   - Billing not set up');
+          console.log('   - API key restrictions');
+          console.log('   - No parking spots within 500m radius');
+        }
         
         // Add real parking spots with distances
         const realSpotsWithDistance = realParkingSpots.map(spot => ({
@@ -507,9 +516,16 @@ const App: React.FC = () => {
         const allSpots = [...spotsWithDistance, ...realSpotsWithDistance];
         spotsWithDistance = allSpots.sort((a, b) => (a.distance || 0) - (b.distance || 0));
         
-        console.log('Total spots after combining:', spotsWithDistance.length);
-        console.log('Demo spots:', spotsWithDistance.length - realSpotsWithDistance.length);
-        console.log('Real spots:', realSpotsWithDistance.length);
+        console.log('🎯 Final Results:');
+        console.log('   Total spots:', spotsWithDistance.length);
+        console.log('   Demo spots:', spotsWithDistance.length - realSpotsWithDistance.length);
+        console.log('   Real spots:', realSpotsWithDistance.length);
+        
+        if (realSpotsWithDistance.length === 0) {
+          console.log('❌ ONLY DEMO SPOTS SHOWN - Google Places API not working!');
+        } else {
+          console.log('✅ SUCCESS! Real + Demo spots combined!');
+        }
       }
       
       setNearbySpots(spotsWithDistance);
@@ -684,10 +700,42 @@ const App: React.FC = () => {
             <button
               onClick={async () => {
                 console.log('🧪 Testing Google Places API...');
+                console.log('🔑 Environment check:');
+                console.log('  - REACT_APP_GOOGLE_MAPS_API_KEY exists:', !!process.env.REACT_APP_GOOGLE_MAPS_API_KEY);
+                console.log('  - API Key length:', process.env.REACT_APP_GOOGLE_MAPS_API_KEY?.length || 0);
+                console.log('  - API Key starts with:', process.env.REACT_APP_GOOGLE_MAPS_API_KEY?.substring(0, 10) || 'N/A');
+                
+                console.log('🔍 Current Google Maps status:');
+                console.log('  - window.google:', (window as any).google);
+                console.log('  - window.google.maps:', (window as any).google?.maps);
+                console.log('  - window.google.maps.places:', (window as any).google?.maps?.places);
+                
+                if (!process.env.REACT_APP_GOOGLE_MAPS_API_KEY) {
+                  alert('❌ NO API KEY FOUND!\n\nEnvironment variable REACT_APP_GOOGLE_MAPS_API_KEY is missing.\n\nCheck Vercel environment variables.');
+                  return;
+                }
+                
+                if (!(window as any).google?.maps?.places) {
+                  alert('❌ Google Places API not loaded!\n\nPossible issues:\n- API key invalid/restricted\n- Maps JavaScript API not enabled\n- Billing not set up\n\nCheck console for details.');
+                  return;
+                }
+                
                 const testLocation = { lat: 54.3520, lng: 18.6466 }; // Gdansk Old Town
-                const testResults = await getRealParkingSpots(testLocation);
-                console.log('🧪 Test results:', testResults);
-                alert(`Test completed! Found ${testResults.length} real parking spots. Check console for details.`);
+                console.log('📍 Testing with location:', testLocation);
+                
+                try {
+                  const testResults = await getRealParkingSpots(testLocation);
+                  console.log('🧪 Test results:', testResults);
+                  
+                  if (testResults.length > 0) {
+                    alert(`✅ SUCCESS! Found ${testResults.length} real parking spots!\n\nCheck console for full details.`);
+                  } else {
+                    alert(`⚠️ API working but no results found.\n\nThis might mean:\n- No parking spots within 500m\n- API quota exceeded\n- Location too remote\n\nCheck console for details.`);
+                  }
+                } catch (error) {
+                  console.error('🧪 Test failed:', error);
+                  alert(`❌ Test failed with error: ${error}\n\nCheck console for details.`);
+                }
               }}
               className="test-button"
               style={{
