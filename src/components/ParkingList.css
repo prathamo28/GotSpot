@@ -1,0 +1,259 @@
+/* Parking List Styles */
+.parking-list {
+  padding: 20px;
+  background: #f7fafc;
+  min-height: 400px;
+}
+
+.spot-card {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border: 1px solid #e2e8f0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.spot-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+  border-color: #cbd5e0;
+}
+
+.spot-card:active {
+  transform: translateY(0);
+}
+
+.spot-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.spot-type-icon {
+  font-size: 24px;
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #f7fafc, #edf2f7);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.spot-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.spot-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a202c;
+  margin: 0 0 8px 0;
+  line-height: 1.3;
+}
+
+.spot-address {
+  color: #4a5568;
+  font-size: 14px;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.spot-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.user-contributed-badge {
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.spot-rating {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.rating-stars {
+  color: #f6ad55;
+  font-size: 14px;
+  letter-spacing: 1px;
+}
+
+.rating-number {
+  font-size: 12px;
+  font-weight: 600;
+  color: #4a5568;
+}
+
+.spot-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  gap: 16px;
+}
+
+.spot-availability {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.available-spots {
+  font-size: 16px;
+  font-weight: 700;
+  color: #38a169;
+}
+
+.total-spots {
+  font-size: 12px;
+  color: #718096;
+}
+
+.spot-meta {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.price-category {
+  color: white;
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.spot-type {
+  background: #edf2f7;
+  color: #4a5568;
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.distance {
+  background: #e6fffa;
+  color: #234e52;
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.spot-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.last-updated {
+  font-size: 12px;
+  color: #718096;
+  font-style: italic;
+}
+
+.spot-features {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.feature-tag {
+  background: #f7fafc;
+  color: #4a5568;
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 500;
+  border: 1px solid #e2e8f0;
+}
+
+.feature-more {
+  background: #edf2f7;
+  color: #718096;
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 500;
+  font-style: italic;
+}
+
+.no-results {
+  text-align: center;
+  padding: 60px 20px;
+  color: #718096;
+}
+
+.no-results-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.no-results h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #4a5568;
+  margin: 0 0 8px 0;
+}
+
+.no-results p {
+  font-size: 14px;
+  margin: 0;
+  opacity: 0.8;
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+  .spot-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .spot-actions {
+    align-items: flex-start;
+    width: 100%;
+  }
+  
+  .spot-details {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .spot-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+}
