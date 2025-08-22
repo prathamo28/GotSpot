@@ -50,7 +50,10 @@ const Map: React.FC<MapProps> = ({ parkingSpots, selectedSpot, onSpotSelect, use
     if (!mapInstance || !parkingSpots.length) return;
 
     // Clear existing markers and info windows
-    markers.forEach((marker: google.maps.Marker) => marker.setMap(null));
+    markers.forEach((marker: google.maps.Marker) => {
+      // Remove marker from map by setting map to null
+      (marker as any).setMap(null);
+    });
     infoWindows.forEach((infoWindow: google.maps.InfoWindow) => infoWindow.close());
     
     const newMarkers: google.maps.Marker[] = [];
