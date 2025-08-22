@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import './App.css';
 import Map from './components/Map';
 import Payment from './components/Payment';
+import { Loader } from '@googlemaps/js-api-loader';
 
 // Enhanced parking spot interface
 interface ParkingSpot {
@@ -65,6 +66,35 @@ const App: React.FC = () => {
         }
       );
     }
+
+    // Load Google Maps API immediately when app starts
+    const loadGoogleMaps = async () => {
+      try {
+        const apiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
+        if (!apiKey) {
+          console.error('Google Maps API key not configured');
+          return;
+        }
+
+        console.log('🚀 Loading Google Maps API...');
+        const loader = new Loader({
+          apiKey: apiKey,
+          version: 'weekly',
+          libraries: ['places']
+        });
+
+        const google = await loader.load();
+        console.log('✅ Google Maps API loaded successfully!');
+        console.log('window.google:', google);
+        
+        // Make it globally available
+        (window as any).google = google;
+      } catch (error) {
+        console.error('❌ Failed to load Google Maps API:', error);
+      }
+    };
+
+    loadGoogleMaps();
   }, []);
 
   const handleLogin = () => {
