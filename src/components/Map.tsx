@@ -241,8 +241,8 @@ const Map: React.FC<MapProps> = ({ parkingSpots, selectedSpot, onSpotSelect, use
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: '#f8fafc',
-        color: '#64748b',
+        background: '#E0F2F7', /* Light blue/grey from sign-up background */
+        color: '#1A202C', /* Dark charcoal grey from sign-up form */
         fontSize: '16px',
         fontWeight: '500'
       }}>
@@ -260,7 +260,7 @@ const Map: React.FC<MapProps> = ({ parkingSpots, selectedSpot, onSpotSelect, use
           height: '100%',
           borderRadius: '16px',
           overflow: 'hidden',
-          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)'
+          boxShadow: '0 8px 32px rgba(26, 32, 44, 0.12)' /* Dark charcoal grey shadow */
         }} 
       />
       
@@ -283,14 +283,14 @@ const Map: React.FC<MapProps> = ({ parkingSpots, selectedSpot, onSpotSelect, use
           style={{
             width: '40px',
             height: '40px',
-            background: 'white',
-            border: '1px solid #e2e8f0',
+            background: '#FFFFFF', /* White from sign-up button */
+            border: '1px solid #1A202C', /* Dark charcoal grey from sign-up form */
             borderRadius: '8px',
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+            boxShadow: '0 2px 8px rgba(26, 32, 44, 0.1)',
             fontSize: '18px'
           }}
           title="Go to my location"
@@ -309,14 +309,14 @@ const Map: React.FC<MapProps> = ({ parkingSpots, selectedSpot, onSpotSelect, use
           style={{
             width: '40px',
             height: '40px',
-            background: 'white',
-            border: '1px solid #e2e8f0',
+            background: '#FFFFFF', /* White from sign-up button */
+            border: '1px solid #1A202C', /* Dark charcoal grey from sign-up form */
             borderRadius: '8px',
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+            boxShadow: '0 2px 8px rgba(26, 32, 44, 0.1)',
             fontSize: '18px'
           }}
           title="Show all parking spots"
@@ -330,24 +330,24 @@ const Map: React.FC<MapProps> = ({ parkingSpots, selectedSpot, onSpotSelect, use
         position: 'absolute',
         bottom: '16px',
         left: '16px',
-        background: 'white',
+        background: '#FFFFFF', /* White from sign-up button */
         padding: '12px 16px',
         borderRadius: '12px',
-        boxShadow: '0 4px 16px rgba(0, 0, 0, 0.1)',
-        border: '1px solid #e2e8f0',
+        boxShadow: '0 4px 16px rgba(26, 32, 44, 0.1)',
+        border: '1px solid #1A202C', /* Dark charcoal grey from sign-up form */
         fontSize: '12px',
         fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif'
       }}>
-        <div style={{ fontWeight: '600', marginBottom: '8px', color: '#1e293b' }}>Legend</div>
+        <div style={{ fontWeight: '600', marginBottom: '8px', color: '#1A202C' }}>Legend</div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
           <div style={{
             width: '16px',
             height: '16px',
             background: '#10b981',
             borderRadius: '50%',
-            border: '2px solid white'
+            border: '2px solid #FFFFFF' /* White from sign-up button */
           }}></div>
-          <span style={{ color: '#64748b' }}>Available</span>
+          <span style={{ color: '#1A202C' }}>Available</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <div style={{
@@ -355,9 +355,9 @@ const Map: React.FC<MapProps> = ({ parkingSpots, selectedSpot, onSpotSelect, use
             height: '16px',
             background: '#ef4444',
             borderRadius: '50%',
-            border: '2px solid white'
+            border: '2px solid #FFFFFF' /* White from sign-up button */
           }}></div>
-          <span style={{ color: '#64748b' }}>Full</span>
+          <span style={{ color: '#1A202C' }}>Full</span>
         </div>
       </div>
     </div>
