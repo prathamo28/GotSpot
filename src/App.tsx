@@ -362,7 +362,7 @@ const App: React.FC = () => {
   };
 
   // Get real parking spots from Google Places API within 500m radius
-  const getRealParkingSpots = async (location: { lat: number; lng: number }) => {
+  const getRealParkingSpots = async (location: { lat: number; lng: number }): Promise<ParkingSpot[]> => {
     try {
       // Check if Google Maps API is loaded
       console.log('Checking Google Maps API availability...');
@@ -395,15 +395,15 @@ const App: React.FC = () => {
       console.log('Google Places API request:', request);
       console.log('Location coordinates:', location);
 
-              return new Promise((resolve) => {
-          console.log('Calling Google Places API nearbySearch...');
-          service.nearbySearch(request, (results: any[], status: any) => {
-            console.log('Google Places API response status:', status);
-            console.log('Google Places API results:', results);
-            console.log('Expected status:', (window as any).google.maps.places.PlacesServiceStatus.OK);
-            
-            if (status === (window as any).google.maps.places.PlacesServiceStatus.OK) {
-            const parkingSpots = results.map((place, index) => ({
+      return new Promise<ParkingSpot[]>((resolve) => {
+        console.log('Calling Google Places API nearbySearch...');
+        service.nearbySearch(request, (results: any[], status: any) => {
+          console.log('Google Places API response status:', status);
+          console.log('Google Places API results:', results);
+          console.log('Expected status:', (window as any).google.maps.places.PlacesServiceStatus.OK);
+          
+          if (status === (window as any).google.maps.places.PlacesServiceStatus.OK) {
+            const parkingSpots: ParkingSpot[] = results.map((place, index) => ({
               id: 1000 + index, // Unique ID for real spots
               name: place.name,
               address: place.vicinity || 'Address not available',
