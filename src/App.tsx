@@ -9,7 +9,6 @@ import Header from './components/Header';
 import SearchSection from './components/SearchSection';
 import ParkingList from './components/ParkingList';
 import ParkingDetails from './components/ParkingDetails';
-import Statistics from './components/Statistics';
 import Map from './components/Map';
 
 const App: React.FC = () => {
@@ -560,11 +559,6 @@ const App: React.FC = () => {
     [detailsSpotId]
   );
 
-  const totalSpots = allParkingSpots.length;
-  const availableSpots = allParkingSpots.reduce((sum, spot) => sum + spot.available, 0);
-  const realSpots = allParkingSpots.filter(spot => spot.isRealSpot).length;
-  const demoSpots = allParkingSpots.filter(spot => !spot.isRealSpot).length;
-
   // Render city selection if needed
   if (isAuthenticated && showCitySelection) {
     return (
@@ -599,8 +593,6 @@ const App: React.FC = () => {
     <div className="app-container">
       <Header 
         onLogout={handleLogout}
-        totalSpots={totalSpots}
-        availableSpots={availableSpots}
         selectedCity={selectedCity}
         availableCities={availableCities}
       />
@@ -625,13 +617,6 @@ const App: React.FC = () => {
       
       {showResults && (
         <>
-          <Statistics 
-            totalSpots={totalSpots}
-            availableSpots={availableSpots}
-            realSpots={realSpots}
-            demoSpots={demoSpots}
-            userContributions={userContributions.length}
-          />
           
           {viewMode === 'list' ? (
             <ParkingList 
