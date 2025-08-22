@@ -365,21 +365,24 @@ const App: React.FC = () => {
   const getRealParkingSpots = async (location: { lat: number; lng: number }): Promise<ParkingSpot[]> => {
     try {
       // Check if Google Maps API is loaded
-      console.log('Checking Google Maps API availability...');
+      console.log('🔍 Checking Google Maps API availability...');
       console.log('window.google:', (window as any).google);
       console.log('window.google.maps:', (window as any).google?.maps);
       console.log('window.google.maps.places:', (window as any).google?.maps?.places);
       
       if (!(window as any).google?.maps?.places) {
-        console.log('Google Places API not loaded yet - waiting for API to load...');
+        console.log('⏳ Google Places API not loaded yet - waiting for API to load...');
         // Wait a bit for API to load
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        await new Promise(resolve => setTimeout(resolve, 3000));
         
         if (!(window as any).google?.maps?.places) {
-          console.log('Google Places API still not available after waiting');
+          console.log('❌ Google Places API still not available after waiting');
+          console.log('💡 Make sure Google Maps API key has Places API enabled');
           return [];
         }
       }
+
+      console.log('✅ Google Places API is available!');
 
       const service = new (window as any).google.maps.places.PlacesService(
         document.createElement('div')
@@ -392,17 +395,26 @@ const App: React.FC = () => {
         keyword: 'parking'
       };
       
-      console.log('Google Places API request:', request);
-      console.log('Location coordinates:', location);
+      console.log('📍 Google Places API request:', request);
+      console.log('🌍 Location coordinates:', location);
 
       return new Promise<ParkingSpot[]>((resolve) => {
-        console.log('Calling Google Places API nearbySearch...');
+        console.log('🚀 Calling Google Places API nearbySearch...');
+        
+        // Add timeout for API call
+        const timeoutId = setTimeout(() => {
+          console.log('⏰ Google Places API call timed out');
+          resolve([]);
+        }, 10000); // 10 second timeout
+        
         service.nearbySearch(request, (results: any[], status: any) => {
-          console.log('Google Places API response status:', status);
-          console.log('Google Places API results:', results);
-          console.log('Expected status:', (window as any).google.maps.places.PlacesServiceStatus.OK);
+          clearTimeout(timeoutId);
+          console.log('📡 Google Places API response status:', status);
+          console.log('📊 Google Places API results:', results);
+          console.log('🎯 Expected status:', (window as any).google.maps.places.PlacesServiceStatus.OK);
           
-          if (status === (window as any).google.maps.places.PlacesServiceStatus.OK) {
+          if (status === (window as any).google.maps.places.PlacesServiceStatus.OK && results && results.length > 0) {
+            console.log(`🎉 Found ${results.length} real parking spots!`);
             const parkingSpots: ParkingSpot[] = results.map((place, index) => ({
               id: 1000 + index, // Unique ID for real spots
               name: place.name,
@@ -425,13 +437,20 @@ const App: React.FC = () => {
             }));
             resolve(parkingSpots);
           } else {
-            console.log('Google Places API error:', status);
+            console.log('❌ Google Places API error or no results:', status);
+            if (status === 'ZERO_RESULTS') {
+              console.log('💡 No parking spots found within 500m radius');
+            } else if (status === 'OVER_QUERY_LIMIT') {
+              console.log('💡 API quota exceeded - check billing setup');
+            } else if (status === 'REQUEST_DENIED') {
+              console.log('💡 API request denied - check API key and billing');
+            }
             resolve([]);
           }
         });
       });
     } catch (error) {
-      console.error('Error fetching real parking spots:', error);
+      console.error('💥 Error fetching real parking spots:', error);
       return [];
     }
   };
@@ -659,6 +678,30 @@ const App: React.FC = () => {
               className="search-button"
             >
               {loading ? '⏳' : '📍'}
+            </button>
+            
+            {/* Test Google Places API Button */}
+            <button
+              onClick={async () => {
+                console.log('🧪 Testing Google Places API...');
+                const testLocation = { lat: 54.3520, lng: 18.6466 }; // Gdansk Old Town
+                const testResults = await getRealParkingSpots(testLocation);
+                console.log('🧪 Test results:', testResults);
+                alert(`Test completed! Found ${testResults.length} real parking spots. Check console for details.`);
+              }}
+              className="test-button"
+              style={{
+                marginLeft: '10px',
+                padding: '8px 16px',
+                backgroundColor: '#6366f1',
+                color: 'white',
+                border: 'none',
+                borderRadius: '6px',
+                fontSize: '12px',
+                cursor: 'pointer'
+              }}
+            >
+              🧪 Test API
             </button>
           </div>
         </div>
