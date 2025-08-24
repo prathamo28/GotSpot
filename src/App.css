@@ -6,8 +6,8 @@
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   line-height: 1.6;
-  color: #1A202C;
-  background: #E0F2F7;
+  color: #0F172A; /* Very Dark Gray/Navy for primary text */
+  background: #F8FAFC; /* Light Grayish White for background */
   margin: 0;
   padding: 0;
 }
@@ -15,15 +15,15 @@ body {
 .app-container {
   max-width: 480px;
   margin: 0 auto;
-  background: white;
+  background: #FFFFFF; /* White for card/secondary background */
   min-height: 100vh;
-  box-shadow: 0 0 20px rgba(26, 32, 44, 0.1);
+  box-shadow: 0 0 20px rgba(15, 23, 42, 0.1);
 }
 
 /* City Selection Styles */
 .city-selection-container {
   min-height: 100vh;
-  background: #E0F2F7;
+  background: #F8FAFC; /* Light Grayish White for background */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -31,11 +31,11 @@ body {
 }
 
 .city-selection-card {
-  background: #1A202C;
+  background: #1E3A8A; /* Deep Navy Blue for primary */
   color: white;
   padding: 40px;
   border-radius: 20px;
-  box-shadow: 0 8px 32px rgba(26, 32, 44, 0.3);
+  box-shadow: 0 8px 32px rgba(30, 58, 138, 0.3);
   text-align: center;
   max-width: 400px;
   width: 100%;
@@ -50,7 +50,7 @@ body {
 
 .city-selection-card p {
   font-size: 16px;
-  color: #E0F2F7;
+  color: #F8FAFC; /* Light Grayish White for secondary text */
   margin: 0 0 32px 0;
   opacity: 0.9;
 }
@@ -61,8 +61,8 @@ body {
 }
 
 .city-button {
-  background: #FFFFFF;
-  color: #1A202C;
+  background: #FFFFFF; /* White for card/secondary background */
+  color: #1E3A8A; /* Deep Navy Blue for primary */
   border: none;
   padding: 20px;
   border-radius: 12px;
@@ -78,8 +78,8 @@ body {
 
 .city-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(255, 255, 255, 0.3);
-  background: #F7FAFC;
+  box-shadow: 0 8px 25px rgba(30, 58, 138, 0.3);
+  background: #F8FAFC; /* Light Grayish White for hover */
 }
 
 .city-name {
@@ -96,15 +96,28 @@ body {
 /* Map Section Styles */
 .map-section {
   padding: 20px;
-  background: white;
-  border-bottom: 1px solid #E0F2F7;
+  background: #FFFFFF; /* White for card/secondary background */
+  border-bottom: 1px solid #F8FAFC; /* Light Grayish White for borders */
+}
+
+.loading-map {
+  height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #F8FAFC; /* Light Grayish White for background */
+  color: #0F172A; /* Very Dark Gray/Navy for primary text */
+  font-size: 16px;
+  font-weight: 500;
+  border-radius: 16px;
+  border: 1px solid #1E3A8A; /* Deep Navy Blue for borders */
 }
 
 /* City Banner Styles */
 .city-banner {
-  background: #E0F2F7;
+  background: #F8FAFC; /* Light Grayish White for background */
   padding: 16px 20px;
-  border-bottom: 1px solid #1A202C;
+  border-bottom: 1px solid #1E3A8A; /* Deep Navy Blue for borders */
 }
 
 .city-info {
@@ -119,17 +132,17 @@ body {
 .city-label {
   font-size: 14px;
   font-weight: 600;
-  color: #1A202C;
+  color: #0F172A; /* Very Dark Gray/Navy for primary text */
 }
 
 .city-name {
   font-size: 18px;
   font-weight: 700;
-  color: #1A202C;
+  color: #1E3A8A; /* Deep Navy Blue for primary */
 }
 
 .change-city-btn {
-  background: #1A202C;
+  background: #1E3A8A; /* Deep Navy Blue for primary */
   color: #FFFFFF;
   border: none;
   padding: 8px 16px;
@@ -142,22 +155,22 @@ body {
 }
 
 .change-city-btn:hover {
-  background: #2D3748;
+  background: #1E40AF; /* Slightly lighter navy for hover */
   transform: translateY(-1px);
 }
 
 /* New Search Section Styles */
 .search-section-new {
   padding: 32px 20px;
-  background: #E0F2F7;
-  border-bottom: 1px solid #1A202C;
+  background: #F8FAFC; /* Light Grayish White for background */
+  border-bottom: 1px solid #1E3A8A; /* Deep Navy Blue for borders */
 }
 
 .search-section-new h3 {
   text-align: center;
   font-size: 20px;
   font-weight: 700;
-  color: #1A202C;
+  color: #0F172A; /* Very Dark Gray/Navy for primary text */
   margin: 0 0 24px 0;
 }
 
@@ -170,17 +183,17 @@ body {
   display: flex;
   gap: 16px;
   align-items: center;
-  background: white;
+  background: #FFFFFF; /* White for card/secondary background */
   border-radius: 16px;
   padding: 8px;
-  box-shadow: 0 4px 20px rgba(26, 32, 44, 0.08);
-  border: 1px solid #1A202C;
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.08);
+  border: 1px solid #1E3A8A; /* Deep Navy Blue for borders */
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .search-input-group:focus-within {
-  box-shadow: 0 8px 32px rgba(26, 32, 44, 0.15);
-  border-color: #1A202C;
+  box-shadow: 0 8px 32px rgba(30, 58, 138, 0.15);
+  border-color: #F97316; /* Orange Accent for focus */
   transform: translateY(-1px);
 }
 
@@ -193,21 +206,21 @@ body {
   outline: none;
   transition: all 0.2s ease;
   background: transparent;
-  color: #1A202C;
+  color: #0F172A; /* Very Dark Gray/Navy for primary text */
   font-weight: 500;
 }
 
 .search-input::placeholder {
-  color: #94a3b8;
+  color: #475569; /* Slate Gray for placeholder */
   font-weight: 400;
 }
 
 .search-input:focus {
-  background: #F7FAFC;
+  background: #F8FAFC; /* Light Grayish White for focus background */
 }
 
 .search-button {
-  background: #1A202C;
+  background: #1E3A8A; /* Deep Navy Blue for primary */
   color: #FFFFFF;
   border: none;
   padding: 18px 32px;
@@ -218,15 +231,15 @@ body {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   white-space: nowrap;
   min-width: 140px;
-  box-shadow: 0 4px 16px rgba(26, 32, 44, 0.3);
-  border: 1px solid #1A202C;
+  box-shadow: 0 4px 16px rgba(30, 58, 138, 0.3);
+  border: 1px solid #1E3A8A; /* Deep Navy Blue for borders */
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 .search-button:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(26, 32, 44, 0.4);
-  background: #2D3748;
+  box-shadow: 0 8px 25px rgba(30, 58, 138, 0.4);
+  background: #1E40AF; /* Slightly lighter navy for hover */
 }
 
 .search-button:disabled {
@@ -244,21 +257,21 @@ body {
   gap: 16px;
   margin-top: 20px;
   padding: 16px;
-  background: white;
+  background: #FFFFFF; /* White for card/secondary background */
   border-radius: 12px;
-  border: 1px solid #1A202C;
+  border: 1px solid #1E3A8A; /* Deep Navy Blue for borders */
   flex-wrap: wrap;
 }
 
 .selected-destination {
   font-size: 16px;
   font-weight: 600;
-  color: #1A202C;
+  color: #0F172A; /* Very Dark Gray/Navy for primary text */
   flex: 1;
 }
 
 .directions-btn {
-  background: #1A202C;
+  background: #F97316; /* Orange Accent for CTAs */
   color: #FFFFFF;
   border: none;
   padding: 12px 20px;
@@ -270,21 +283,21 @@ body {
 }
 
 .directions-btn:hover {
-  background: #2D3748;
+  background: #EA580C; /* Darker orange for hover */
   transform: translateY(-1px);
 }
 
 /* Recent Searches */
 .recent-searches {
   padding: 24px 20px;
-  background: white;
-  border-bottom: 1px solid #E0F2F7;
+  background: #FFFFFF; /* White for card/secondary background */
+  border-bottom: 1px solid #F8FAFC; /* Light Grayish White for borders */
 }
 
 .recent-searches h3 {
   font-size: 18px;
   font-weight: 600;
-  color: #1A202C;
+  color: #0F172A; /* Very Dark Gray/Navy for primary text */
   margin: 0 0 16px 0;
   text-align: center;
 }
@@ -299,9 +312,9 @@ body {
 }
 
 .search-tag {
-  background: #E0F2F7;
-  color: #1A202C;
-  border: 1px solid #1A202C;
+  background: #F8FAFC; /* Light Grayish White for background */
+  color: #0F172A; /* Very Dark Gray/Navy for primary text */
+  border: 1px solid #1E3A8A; /* Deep Navy Blue for borders */
   padding: 8px 16px;
   border-radius: 20px;
   font-size: 14px;
@@ -311,13 +324,13 @@ body {
 }
 
 .search-tag:hover {
-  background: #1A202C;
+  background: #1E3A8A; /* Deep Navy Blue for hover */
   color: #FFFFFF;
   transform: translateY(-1px);
 }
 
 .no-recent {
-  color: #94a3b8;
+  color: #475569; /* Slate Gray for secondary text */
   font-style: italic;
   text-align: center;
   margin: 0;
@@ -326,26 +339,26 @@ body {
 /* Results Section */
 .results-section {
   padding: 24px 20px;
-  background: #E0F2F7;
-  border-bottom: 1px solid #1A202C;
+  background: #F8FAFC; /* Light Grayish White for background */
+  border-bottom: 1px solid #1E3A8A; /* Deep Navy Blue for borders */
 }
 
 .results-section h3 {
   font-size: 18px;
   font-weight: 600;
-  color: #1A202C;
+  color: #0F172A; /* Very Dark Gray/Navy for primary text */
   margin: 0 0 20px 0;
   text-align: center;
 }
 
 .view-toggle {
   display: flex;
-  background: white;
+  background: #FFFFFF; /* White for card/secondary background */
   border-radius: 12px;
   padding: 6px;
   gap: 6px;
-  box-shadow: 0 2px 12px rgba(26, 32, 44, 0.06);
-  border: 1px solid #1A202C;
+  box-shadow: 0 2px 12px rgba(15, 23, 42, 0.06);
+  border: 1px solid #1E3A8A; /* Deep Navy Blue for borders */
   max-width: 300px;
   margin: 0 auto 20px auto;
 }
@@ -360,7 +373,7 @@ body {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  color: #64748b;
+  color: #475569; /* Slate Gray for secondary text */
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   position: relative;
   overflow: hidden;
@@ -373,22 +386,22 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background: #1A202C;
+  background: #1E3A8A; /* Deep Navy Blue for primary */
   opacity: 0;
   transition: opacity 0.3s ease;
   z-index: -1;
 }
 
 .toggle-button.active {
-  background: #1A202C;
+  background: #1E3A8A; /* Deep Navy Blue for primary */
   color: #FFFFFF;
-  box-shadow: 0 4px 16px rgba(26, 32, 44, 0.3);
+  box-shadow: 0 4px 16px rgba(30, 58, 138, 0.3);
   transform: translateY(-1px);
 }
 
 .toggle-button:hover:not(.active) {
-  background: #F7FAFC;
-  color: #1A202C;
+  background: #F8FAFC; /* Light Grayish White for hover */
+  color: #0F172A; /* Very Dark Gray/Navy for primary text */
   transform: translateY(-1px);
 }
 
@@ -415,12 +428,12 @@ body {
   align-items: center;
   justify-content: center;
   padding: 40px;
-  color: #718096;
+  color: #475569; /* Slate Gray for secondary text */
 }
 
 .loading-spinner {
-  border: 2px solid #e2e8f0;
-  border-top: 2px solid #1A202C;
+  border: 2px solid #E2E8F0;
+  border-top: 2px solid #1E3A8A; /* Deep Navy Blue for primary */
   border-radius: 50%;
   width: 20px;
   height: 20px;
@@ -435,23 +448,23 @@ body {
 
 /* Error states */
 .error-message {
-  background: #fed7d7;
-  color: #c53030;
+  background: #FEE2E2;
+  color: #DC2626;
   padding: 16px;
   border-radius: 8px;
   margin: 20px;
   text-align: center;
-  border: 1px solid #feb2b2;
+  border: 1px solid #FECACA;
 }
 
 .success-message {
-  background: #c6f6d5;
-  color: #22543d;
+  background: #DCFCE7;
+  color: #166534;
   padding: 16px;
   border-radius: 8px;
   margin: 20px;
   text-align: center;
-  border: 1px solid #9ae6b4;
+  border: 1px solid #BBF7D0;
 }
 
 /* Responsive utilities */

@@ -1,33 +1,33 @@
-/* Header Styles - New Color Palette from Sign-up Image */
+/* Header Styles - New Color Palette */
 .app-header {
-  background: #1A202C; /* Dark charcoal grey from sign-up form */
-  color: white;
-  padding: 0;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: #1E3A8A; /* Deep Navy Blue for primary */
+  color: #FFFFFF;
+  box-shadow: 0 4px 20px rgba(30, 58, 138, 0.3);
+  border-bottom: 1px solid #1E40AF;
 }
 
 .header-content {
-  padding: 24px 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 20px;
+  padding: 24px 20px;
   max-width: 1200px;
   margin: 0 auto;
+  gap: 20px;
+}
+
+.header-brand {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .header-brand h1 {
   font-size: 28px;
   font-weight: 800;
   margin: 0;
-  color: #FFFFFF; /* Pure white from sign-up button */
+  color: #FFFFFF;
   letter-spacing: -0.5px;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 .header-brand p {
@@ -47,8 +47,8 @@
 }
 
 .logout-button {
-  background: #FFFFFF; /* White from sign-up button */
-  color: #1A202C; /* Dark charcoal grey from sign-up form */
+  background: #FFFFFF; /* White for card/secondary background */
+  color: #1E3A8A; /* Deep Navy Blue for primary */
   border: none;
   padding: 12px 20px;
   border-radius: 10px;
@@ -62,9 +62,15 @@
 }
 
 .logout-button:hover {
+  background: #F8FAFC; /* Light Grayish White for hover */
+  color: #1E3A8A; /* Deep Navy Blue for primary */
   transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(255, 255, 255, 0.3);
-  background: #F7FAFC;
+}
+
+.logout-button:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 16px rgba(255, 255, 255, 0.2);
 }
 
 .pilot-banner {

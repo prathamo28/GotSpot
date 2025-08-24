@@ -32,6 +32,7 @@ const App: React.FC = () => {
   const [userContributions, setUserContributions] = useState<ParkingSpot[]>([]);
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const [selectedDestination, setSelectedDestination] = useState<{ name: string; coordinates: { lat: number; lng: number } } | null>(null);
+  const [isGoogleMapsReady, setIsGoogleMapsReady] = useState(false);
 
   // Available cities
   const availableCities = [
@@ -380,6 +381,7 @@ const App: React.FC = () => {
         
         // Make it globally available
         (window as any).google = google;
+        setIsGoogleMapsReady(true); // Set ready state
       } catch (error) {
         console.error('❌ Failed to load Google Maps API:', error);
       }
@@ -640,12 +642,18 @@ const App: React.FC = () => {
       
       {/* Map Section - Always Visible */}
       <div className="map-section">
-        <Map 
-          parkingSpots={nearbySpots.length > 0 ? nearbySpots : allParkingSpots}
-          userLocation={userLocation}
-          onSpotSelect={openSpotDetails}
-          selectedDestination={selectedDestination}
-        />
+        {isGoogleMapsReady ? (
+          <Map 
+            parkingSpots={nearbySpots.length > 0 ? nearbySpots : allParkingSpots}
+            userLocation={userLocation}
+            onSpotSelect={openSpotDetails}
+            selectedDestination={selectedDestination}
+          />
+        ) : (
+          <div className="loading-map">
+            <p>Loading Google Maps...</p>
+          </div>
+        )}
       </div>
       
       {/* Search Section - Under Map */}
