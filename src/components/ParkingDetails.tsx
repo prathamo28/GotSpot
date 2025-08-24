@@ -95,12 +95,7 @@ const ParkingDetails: React.FC<ParkingDetailsProps> = ({ spot, isOpen, onClose, 
                 <span className="availability-number total">{spot.total}</span>
                 <span className="availability-label">Total Spots</span>
               </div>
-              {spot.distance && (
-                <div className="availability-item">
-                  <span className="availability-number distance">{spot.distance.toFixed(1)}</span>
-                  <span className="availability-label">km Away</span>
-                </div>
-              )}
+
             </div>
           </div>
           

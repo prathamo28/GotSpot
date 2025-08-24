@@ -844,8 +844,78 @@ const App: React.FC = () => {
     }
   };
 
-  // Search functionality
-  const findNearbyParking = async (destination: string) => {
+  // Handle destination selection
+  const handleDestinationSelect = (destinationName: string, coordinates: { lat: number; lng: number }) => {
+    setSelectedDestination({ name: destinationName, coordinates });
+    setDestination(destinationName);
+    // Center map on selected destination
+    if (userLocation) {
+      // You can add map centering logic here
+    }
+  };
+
+  // Get directions/route
+  const getDirections = () => {
+    if (!selectedDestination || !userLocation) return;
+    
+    // Open Google Maps with directions
+    const origin = `${userLocation.lat},${userLocation.lng}`;
+    const destination = `${selectedDestination.coordinates.lat},${selectedDestination.coordinates.lng}`;
+    const url = `https://www.google.com/maps/dir/${origin}/${destination}`;
+    window.open(url, '_blank');
+  };
+
+  // Enhanced search functionality with destination geocoding
+  const handleSearch = async () => {
+    if (!destination.trim()) return;
+    
+    setLoading(true);
+    setShowResults(false);
+    
+    try {
+      // First, try to geocode the destination to get coordinates
+      if ((window as any).google?.maps?.Geocoder) {
+        const geocoder = new (window as any).google.maps.Geocoder();
+        const result = await geocoder.geocode({ 
+          address: `${destination}, ${availableCities.find(c => c.id === selectedCity)?.name || 'Gdańsk'}, Poland` 
+        });
+        
+        if (result.results[0]) {
+          const coords = result.results[0].geometry.location;
+          const destinationCoords = { 
+            lat: coords.lat(), 
+            lng: coords.lng() 
+          };
+          
+          setSelectedDestination({
+            name: destination,
+            coordinates: destinationCoords
+          });
+          
+          // Now search for parking around this destination
+          await findNearbyParking(destination, destinationCoords);
+        } else {
+          // Fallback to demo data only
+          setNearbySpots(allParkingSpots);
+          setShowResults(true);
+        }
+      } else {
+        // Google Maps not available, use demo data
+        setNearbySpots(allParkingSpots);
+        setShowResults(true);
+      }
+    } catch (error) {
+      console.error('Search failed:', error);
+      // Fallback to demo data
+      setNearbySpots(allParkingSpots);
+      setShowResults(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Search functionality - now takes destination coordinates as parameter
+  const findNearbyParking = async (destination: string, destinationCoords?: { lat: number; lng: number }) => {
     if (!destination.trim()) return;
     
     setLoading(true);
@@ -865,12 +935,12 @@ const App: React.FC = () => {
       }
       
       // Filter spots within 1000 meters of the destination
-      const destinationCoords = selectedDestination?.coordinates;
-      if (destinationCoords) {
+      const coords = destinationCoords || selectedDestination?.coordinates;
+      if (coords) {
         const nearbySpots = combinedSpots.filter(spot => {
           const distance = calculateDistance(
-            destinationCoords.lat,
-            destinationCoords.lng,
+            coords.lat,
+            coords.lng,
             spot.coordinates.lat,
             spot.coordinates.lng
           );
@@ -880,14 +950,14 @@ const App: React.FC = () => {
         // Sort by distance and availability
         nearbySpots.sort((a, b) => {
           const distanceA = calculateDistance(
-            destinationCoords.lat,
-            destinationCoords.lng,
+            coords.lat,
+            coords.lng,
             a.coordinates.lat,
             a.coordinates.lng
           );
           const distanceB = calculateDistance(
-            destinationCoords.lat,
-            destinationCoords.lng,
+            coords.lat,
+            coords.lng,
             b.coordinates.lat,
             b.coordinates.lng
           );
@@ -912,48 +982,19 @@ const App: React.FC = () => {
         
         console.log(`🎯 Found ${nearbySpots.length} parking spots within 1km of "${destination}"`);
         console.log(`📍 Real spots: ${realSpots.length}, Demo spots: ${nearbySpots.length - realSpots.length}`);
+      } else {
+        // No destination coordinates, show all spots
+        setNearbySpots(combinedSpots);
+        setShowResults(true);
       }
     } catch (error) {
       console.error('Error finding nearby parking:', error);
       // Fallback to demo data only
-      const destinationCoords = selectedDestination?.coordinates;
-      if (destinationCoords) {
-        const nearbySpots = allParkingSpots.filter(spot => {
-          const distance = calculateDistance(
-            destinationCoords.lat,
-            destinationCoords.lng,
-            spot.coordinates.lat,
-            spot.coordinates.lng
-          );
-          return distance <= 1000;
-        });
-        setNearbySpots(nearbySpots);
-        setShowResults(true);
-      }
+      setNearbySpots(allParkingSpots);
+      setShowResults(true);
     } finally {
       setLoading(false);
     }
-  };
-
-  // Handle destination selection
-  const handleDestinationSelect = (destinationName: string, coordinates: { lat: number; lng: number }) => {
-    setSelectedDestination({ name: destinationName, coordinates });
-    setDestination(destinationName);
-    // Center map on selected destination
-    if (userLocation) {
-      // You can add map centering logic here
-    }
-  };
-
-  // Get directions/route
-  const getDirections = () => {
-    if (!selectedDestination || !userLocation) return;
-    
-    // Open Google Maps with directions
-    const origin = `${userLocation.lat},${userLocation.lng}`;
-    const destination = `${selectedDestination.coordinates.lat},${selectedDestination.coordinates.lng}`;
-    const url = `https://www.google.com/maps/dir/${origin}/${destination}`;
-    window.open(url, '_blank');
   };
 
   // Get real parking spots from Google Maps API
@@ -1206,13 +1247,13 @@ const App: React.FC = () => {
               type="text"
               value={destination}
               onChange={(e) => setDestination(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && findNearbyParking(destination)}
+              onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
               placeholder="Enter destination name..."
               className="search-input"
               disabled={loading}
             />
             <button
-              onClick={() => findNearbyParking(destination)}
+              onClick={handleSearch}
               className="search-button"
               disabled={loading || !destination.trim()}
             >
@@ -1260,7 +1301,7 @@ const App: React.FC = () => {
       {/* Search Results */}
       {showResults && nearbySpots.length > 0 && (
         <div className="results-section">
-          <h3>🚗 Nearby Parking Spots (500m - 1000m)</h3>
+          <h3>🚗 Nearby Parking Spots (within 1km)</h3>
           <div className="view-toggle">
             <button
               className={`toggle-button ${viewMode === 'list' ? 'active' : ''}`}
