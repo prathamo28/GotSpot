@@ -89,7 +89,7 @@ const App: React.FC = () => {
       images: []
     },
     
-    // Additional Gdansk parking spots
+    // Additional Gdansk parking spots - 50 total
     {
       id: 4,
       name: "Ergo Arena Parking",
@@ -327,6 +327,426 @@ const App: React.FC = () => {
       coordinates: { lat: 54.3770, lng: 18.4660 },
       features: ["Covered", "Security", "24/7", "Cameras", "Lighting"],
       images: []
+    },
+    {
+      id: 21,
+      name: "Gdańsk Science and Technology Park",
+      address: "Trzy Lipy 3, 80-172 Gdańsk",
+      available: 45,
+      total: 120,
+      price: "3 PLN/h",
+      type: "office",
+      rating: 4.1,
+      lastUpdated: "2 minutes ago",
+      coordinates: { lat: 54.3780, lng: 18.6200 },
+      features: ["Covered", "Security", "EV Charging", "24/7"],
+      images: []
+    },
+    {
+      id: 22,
+      name: "Gdańsk Marina Parking",
+      address: "Szafarnia 5, 80-755 Gdańsk",
+      available: 34,
+      total: 80,
+      price: "5 PLN/h",
+      type: "attraction",
+      rating: 4.3,
+      lastUpdated: "1 minute ago",
+      coordinates: { lat: 54.3490, lng: 18.6590 },
+      features: ["Security", "Tourist Area", "Marina Access"],
+      images: []
+    },
+    {
+      id: 23,
+      name: "Gdańsk Central Business District",
+      address: "aleja Grunwaldzka 472, 80-309 Gdańsk",
+      available: 78,
+      total: 200,
+      price: "4 PLN/h",
+      type: "office",
+      rating: 4.0,
+      lastUpdated: "3 minutes ago",
+      coordinates: { lat: 54.3750, lng: 18.6150 },
+      features: ["Covered", "Security", "EV Charging", "Disabled Access"],
+      images: []
+    },
+    {
+      id: 24,
+      name: "Gdańsk Sports Center",
+      address: "aleja Grunwaldzka 244, 80-266 Gdańsk",
+      available: 56,
+      total: 150,
+      price: "3 PLN/h",
+      type: "sports",
+      rating: 4.2,
+      lastUpdated: "2 minutes ago",
+      coordinates: { lat: 54.3780, lng: 18.6120 },
+      features: ["Covered", "Security", "Sports Facilities", "24/7"],
+      images: []
+    },
+    {
+      id: 25,
+      name: "Gdańsk Cultural Center",
+      address: "aleja Grunwaldzka 19, 80-264 Gdańsk",
+      available: 23,
+      total: 60,
+      price: "4 PLN/h",
+      type: "cultural",
+      rating: 4.4,
+      lastUpdated: "1 minute ago",
+      coordinates: { lat: 54.3550, lng: 18.6450 },
+      features: ["Security", "Cultural Events", "Tourist Area"],
+      images: []
+    },
+    {
+      id: 26,
+      name: "Gdańsk Library Parking",
+      address: "Targ Rakowy 5/6, 80-806 Gdańsk",
+      available: 12,
+      total: 40,
+      price: "Free",
+      type: "public",
+      rating: 4.0,
+      lastUpdated: "2 minutes ago",
+      coordinates: { lat: 54.3540, lng: 18.6480 },
+      features: ["Security", "Library Access", "Public Service"],
+      images: []
+    },
+    {
+      id: 27,
+      name: "Gdańsk Post Office",
+      address: "Długa 22, 80-827 Gdańsk",
+      available: 8,
+      total: 25,
+      price: "2 PLN/h",
+      type: "public",
+      rating: 3.8,
+      lastUpdated: "1 minute ago",
+      coordinates: { lat: 54.3500, lng: 18.6500 },
+      features: ["Security", "Post Office", "Public Service"],
+      images: []
+    },
+    {
+      id: 28,
+      name: "Gdańsk Police Station",
+      address: "Nowe Ogrody 27, 80-803 Gdańsk",
+      available: 15,
+      total: 35,
+      price: "Free",
+      type: "public",
+      rating: 4.1,
+      lastUpdated: "2 minutes ago",
+      coordinates: { lat: 54.3520, lng: 18.6470 },
+      features: ["Security", "Police Station", "24/7"],
+      images: []
+    },
+    {
+      id: 29,
+      name: "Gdańsk Fire Station",
+      address: "aleja Grunwaldzka 82, 80-244 Gdańsk",
+      available: 5,
+      total: 20,
+      price: "Free",
+      type: "public",
+      rating: 4.3,
+      lastUpdated: "1 minute ago",
+      coordinates: { lat: 54.3800, lng: 18.6100 },
+      features: ["Security", "Fire Station", "Emergency Access"],
+      images: []
+    },
+    {
+      id: 30,
+      name: "Gdańsk City Hall",
+      address: "aleja Grunwaldzka 474, 80-309 Gdańsk",
+      available: 20,
+      total: 50,
+      price: "3 PLN/h",
+      type: "public",
+      rating: 4.0,
+      lastUpdated: "2 minutes ago",
+      coordinates: { lat: 54.3750, lng: 18.6150 },
+      features: ["Security", "City Hall", "Public Service"],
+      images: []
+    },
+    {
+      id: 31,
+      name: "Gdańsk Court Building",
+      address: "Nowe Ogrody 30, 80-803 Gdańsk",
+      available: 18,
+      total: 45,
+      price: "3 PLN/h",
+      type: "public",
+      rating: 3.9,
+      lastUpdated: "1 minute ago",
+      coordinates: { lat: 54.3520, lng: 18.6470 },
+      features: ["Security", "Court Building", "Public Service"],
+      images: []
+    },
+    {
+      id: 32,
+      name: "Gdańsk Tax Office",
+      address: "aleja Grunwaldzka 472, 80-309 Gdańsk",
+      available: 25,
+      total: 60,
+      price: "3 PLN/h",
+      type: "public",
+      rating: 4.0,
+      lastUpdated: "2 minutes ago",
+      coordinates: { lat: 54.3750, lng: 18.6150 },
+      features: ["Security", "Tax Office", "Public Service"],
+      images: []
+    },
+    {
+      id: 33,
+      name: "Gdańsk Social Insurance",
+      address: "aleja Grunwaldzka 244, 80-266 Gdańsk",
+      available: 22,
+      total: 55,
+      price: "3 PLN/h",
+      type: "public",
+      rating: 3.8,
+      lastUpdated: "1 minute ago",
+      coordinates: { lat: 54.3780, lng: 18.6120 },
+      features: ["Security", "Social Insurance", "Public Service"],
+      images: []
+    },
+    {
+      id: 34,
+      name: "Gdańsk Employment Office",
+      address: "aleja Grunwaldzka 19, 80-264 Gdańsk",
+      available: 19,
+      total: 48,
+      price: "3 PLN/h",
+      type: "public",
+      rating: 3.9,
+      lastUpdated: "2 minutes ago",
+      coordinates: { lat: 54.3550, lng: 18.6450 },
+      features: ["Security", "Employment Office", "Public Service"],
+      images: []
+    },
+    {
+      id: 35,
+      name: "Gdańsk Bank Center",
+      address: "aleja Grunwaldzka 472, 80-309 Gdańsk",
+      available: 45,
+      total: 120,
+      price: "4 PLN/h",
+      type: "office",
+      rating: 4.1,
+      lastUpdated: "1 minute ago",
+      coordinates: { lat: 54.3750, lng: 18.6150 },
+      features: ["Covered", "Security", "Banking Services", "24/7"],
+      images: []
+    },
+    {
+      id: 36,
+      name: "Gdańsk Insurance District",
+      address: "aleja Grunwaldzka 244, 80-266 Gdańsk",
+      available: 38,
+      total: 95,
+      price: "4 PLN/h",
+      type: "office",
+      rating: 4.0,
+      lastUpdated: "2 minutes ago",
+      coordinates: { lat: 54.3780, lng: 18.6120 },
+      features: ["Covered", "Security", "Insurance Services"],
+      images: []
+    },
+    {
+      id: 37,
+      name: "Gdańsk Legal District",
+      address: "aleja Grunwaldzka 19, 80-264 Gdańsk",
+      available: 28,
+      total: 70,
+      price: "4 PLN/h",
+      type: "office",
+      rating: 4.2,
+      lastUpdated: "1 minute ago",
+      coordinates: { lat: 54.3550, lng: 18.6450 },
+      features: ["Covered", "Security", "Legal Services"],
+      images: []
+    },
+    {
+      id: 38,
+      name: "Gdańsk Consulting Hub",
+      address: "aleja Grunwaldzka 472, 80-309 Gdańsk",
+      available: 35,
+      total: 88,
+      price: "4 PLN/h",
+      type: "office",
+      rating: 4.1,
+      lastUpdated: "2 minutes ago",
+      coordinates: { lat: 54.3750, lng: 18.6150 },
+      features: ["Covered", "Security", "Consulting Services"],
+      images: []
+    },
+    {
+      id: 39,
+      name: "Gdańsk IT Park",
+      address: "aleja Grunwaldzka 244, 80-266 Gdańsk",
+      available: 67,
+      total: 168,
+      price: "3 PLN/h",
+      type: "office",
+      rating: 4.3,
+      lastUpdated: "1 minute ago",
+      coordinates: { lat: 54.3780, lng: 18.6120 },
+      features: ["Covered", "Security", "IT Services", "Free WiFi"],
+      images: []
+    },
+    {
+      id: 40,
+      name: "Gdańsk Startup Zone",
+      address: "aleja Grunwaldzka 19, 80-264 Gdańsk",
+      available: 42,
+      total: 105,
+      price: "3 PLN/h",
+      type: "office",
+      rating: 4.4,
+      lastUpdated: "2 minutes ago",
+      coordinates: { lat: 54.3550, lng: 18.6450 },
+      features: ["Covered", "Security", "Startup Services", "Free WiFi"],
+      images: []
+    },
+    {
+      id: 41,
+      name: "Gdańsk Co-working Space",
+      address: "aleja Grunwaldzka 472, 80-309 Gdańsk",
+      available: 23,
+      total: 58,
+      price: "3 PLN/h",
+      type: "office",
+      rating: 4.2,
+      lastUpdated: "1 minute ago",
+      coordinates: { lat: 54.3750, lng: 18.6150 },
+      features: ["Covered", "Security", "Co-working", "Free WiFi"],
+      images: []
+    },
+    {
+      id: 42,
+      name: "Gdańsk Innovation Center",
+      address: "aleja Grunwaldzka 244, 80-266 Gdańsk",
+      available: 31,
+      total: 78,
+      price: "4 PLN/h",
+      type: "office",
+      rating: 4.1,
+      lastUpdated: "2 minutes ago",
+      coordinates: { lat: 54.3780, lng: 18.6120 },
+      features: ["Covered", "Security", "Innovation Services"],
+      images: []
+    },
+    {
+      id: 43,
+      name: "Gdańsk Research Institute",
+      address: "aleja Grunwaldzka 19, 80-264 Gdańsk",
+      available: 19,
+      total: 48,
+      price: "3 PLN/h",
+      type: "office",
+      rating: 4.0,
+      lastUpdated: "1 minute ago",
+      coordinates: { lat: 54.3550, lng: 18.6450 },
+      features: ["Covered", "Security", "Research Services"],
+      images: []
+    },
+    {
+      id: 44,
+      name: "Gdańsk Development Agency",
+      address: "aleja Grunwaldzka 472, 80-309 Gdańsk",
+      available: 26,
+      total: 65,
+      price: "3 PLN/h",
+      type: "office",
+      rating: 4.1,
+      lastUpdated: "2 minutes ago",
+      coordinates: { lat: 54.3750, lng: 18.6150 },
+      features: ["Covered", "Security", "Development Services"],
+      images: []
+    },
+    {
+      id: 45,
+      name: "Gdańsk Export Center",
+      address: "aleja Grunwaldzka 244, 80-266 Gdańsk",
+      available: 33,
+      total: 83,
+      price: "4 PLN/h",
+      type: "office",
+      rating: 4.0,
+      lastUpdated: "1 minute ago",
+      coordinates: { lat: 54.3780, lng: 18.6120 },
+      features: ["Covered", "Security", "Export Services"],
+      images: []
+    },
+    {
+      id: 46,
+      name: "Gdańsk Trade Center",
+      address: "aleja Grunwaldzka 19, 80-264 Gdańsk",
+      available: 47,
+      total: 118,
+      price: "3 PLN/h",
+      type: "office",
+      rating: 4.2,
+      lastUpdated: "2 minutes ago",
+      coordinates: { lat: 54.3550, lng: 18.6450 },
+      features: ["Covered", "Security", "Trade Services"],
+      images: []
+    },
+    {
+      id: 47,
+      name: "Gdańsk Business Park",
+      address: "aleja Grunwaldzka 472, 80-309 Gdańsk",
+      available: 89,
+      total: 223,
+      price: "4 PLN/h",
+      type: "office",
+      rating: 4.3,
+      lastUpdated: "1 minute ago",
+      coordinates: { lat: 54.3750, lng: 18.6150 },
+      features: ["Covered", "Security", "Business Services", "EV Charging"],
+      images: []
+    },
+    {
+      id: 48,
+      name: "Gdańsk Corporate Hub",
+      address: "aleja Grunwaldzka 244, 80-266 Gdańsk",
+      available: 56,
+      total: 140,
+      price: "4 PLN/h",
+      type: "office",
+      rating: 4.1,
+      lastUpdated: "2 minutes ago",
+      coordinates: { lat: 54.3780, lng: 18.6120 },
+      features: ["Covered", "Security", "Corporate Services"],
+      images: []
+    },
+    {
+      id: 49,
+      name: "Gdańsk Executive Center",
+      address: "aleja Grunwaldzka 19, 80-264 Gdańsk",
+      available: 34,
+      total: 85,
+      price: "5 PLN/h",
+      type: "office",
+      rating: 4.4,
+      lastUpdated: "1 minute ago",
+      coordinates: { lat: 54.3550, lng: 18.6450 },
+      features: ["Covered", "Security", "Executive Services", "Premium"],
+      images: []
+    },
+    {
+      id: 50,
+      name: "Gdańsk Premium Parking",
+      address: "aleja Grunwaldzka 472, 80-309 Gdańsk",
+      available: 12,
+      total: 30,
+      price: "6 PLN/h",
+      type: "premium",
+      rating: 4.5,
+      lastUpdated: "2 minutes ago",
+      coordinates: { lat: 54.3750, lng: 18.6150 },
+      features: ["Covered", "Security", "Premium Service", "Valet", "24/7"],
+      images: []
     }
   ];
 
@@ -425,50 +845,91 @@ const App: React.FC = () => {
   };
 
   // Search functionality
-  const findNearbyParking = async () => {
+  const findNearbyParking = async (destination: string) => {
     if (!destination.trim()) return;
     
     setLoading(true);
-    setShowResults(true);
-    
-    // Add to recent searches
-    if (!recentSearches.includes(destination.trim())) {
-      setRecentSearches(prev => [destination.trim(), ...prev.slice(0, 4)]); // Keep last 5 searches
-    }
+    setShowResults(false);
     
     try {
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Get real parking spots from Google Maps API
+      // First, try to get real parking spots from Google Maps
       const realSpots = await getRealParkingSpots(destination);
       
-      // Combine real spots with demo spots
-      const allSpots = [...allParkingSpots, ...realSpots];
+      // Combine real spots with demo spots for comprehensive coverage
+      let combinedSpots = [...allParkingSpots];
       
-      // Calculate distances and filter by 500m-1000m range
-      const spotsWithDistance = allSpots
-        .map(spot => ({
-          ...spot,
-          distance: calculateDistance(
-            userLocation?.lat || 54.3520,
-            userLocation?.lng || 18.6466,
+      if (realSpots.length > 0) {
+        // Add real spots to the beginning for priority
+        combinedSpots = [...realSpots, ...combinedSpots];
+        console.log(`✅ Combined ${realSpots.length} real spots with ${allParkingSpots.length} demo spots`);
+      }
+      
+      // Filter spots within 1000 meters of the destination
+      const destinationCoords = selectedDestination?.coordinates;
+      if (destinationCoords) {
+        const nearbySpots = combinedSpots.filter(spot => {
+          const distance = calculateDistance(
+            destinationCoords.lat,
+            destinationCoords.lng,
             spot.coordinates.lat,
             spot.coordinates.lng
-          )
-        }))
-        .filter(spot => spot.distance >= 0.5 && spot.distance <= 1.0) // 500m to 1000m range
-        .sort((a, b) => a.distance - b.distance);
-      
-      setNearbySpots(spotsWithDistance);
+          );
+          return distance <= 1000; // 1km radius
+        });
+        
+        // Sort by distance and availability
+        nearbySpots.sort((a, b) => {
+          const distanceA = calculateDistance(
+            destinationCoords.lat,
+            destinationCoords.lng,
+            a.coordinates.lat,
+            a.coordinates.lng
+          );
+          const distanceB = calculateDistance(
+            destinationCoords.lat,
+            destinationCoords.lng,
+            b.coordinates.lat,
+            b.coordinates.lng
+          );
+          
+          // Prioritize real spots, then by distance, then by availability
+          if (a.isRealSpot && !b.isRealSpot) return -1;
+          if (!a.isRealSpot && b.isRealSpot) return 1;
+          if (Math.abs(distanceA - distanceB) < 100) {
+            // If distances are similar, prioritize availability
+            return b.available - a.available;
+          }
+          return distanceA - distanceB;
+        });
+        
+        setNearbySpots(nearbySpots);
+        setShowResults(true);
+        
+        // Add to recent searches
+        if (!recentSearches.includes(destination)) {
+          setRecentSearches(prev => [destination, ...prev.slice(0, 9)]);
+        }
+        
+        console.log(`🎯 Found ${nearbySpots.length} parking spots within 1km of "${destination}"`);
+        console.log(`📍 Real spots: ${realSpots.length}, Demo spots: ${nearbySpots.length - realSpots.length}`);
+      }
     } catch (error) {
-      console.error('Error finding parking:', error);
-      // Fallback to demo spots only
-      const spotsWithDistance = allParkingSpots.map(spot => ({
-        ...spot,
-        distance: Math.random() * 0.5 + 0.5 // 500m to 1000m range
-      }));
-      setNearbySpots(spotsWithDistance);
+      console.error('Error finding nearby parking:', error);
+      // Fallback to demo data only
+      const destinationCoords = selectedDestination?.coordinates;
+      if (destinationCoords) {
+        const nearbySpots = allParkingSpots.filter(spot => {
+          const distance = calculateDistance(
+            destinationCoords.lat,
+            destinationCoords.lng,
+            spot.coordinates.lat,
+            spot.coordinates.lng
+          );
+          return distance <= 1000;
+        });
+        setNearbySpots(nearbySpots);
+        setShowResults(true);
+      }
     } finally {
       setLoading(false);
     }
@@ -506,43 +967,123 @@ const App: React.FC = () => {
       const google = (window as any).google;
       const service = new google.maps.places.PlacesService(document.createElement('div'));
       
-      // Search for parking near the destination
-      const searchRequest = {
-        query: `parking near ${query}, ${selectedCity}, Poland`,
-        type: ['parking'],
-        location: userLocation || { lat: 54.3520, lng: 18.6466 },
-        radius: 5000, // 5km search radius
-        maxResults: 20
-      };
+      // Multiple search strategies for better results
+      const searchQueries = [
+        `parking near ${query}, ${selectedCity}, Poland`,
+        `parking garage ${query}, ${selectedCity}, Poland`,
+        `parking lot ${query}, ${selectedCity}, Poland`,
+        `car park ${query}, ${selectedCity}, Poland`,
+        `parking space ${query}, ${selectedCity}, Poland`
+      ];
 
-      return new Promise((resolve, reject) => {
-        service.textSearch(searchRequest, (results: any[], status: any) => {
-          if (status === google.maps.places.PlacesServiceStatus.OK && results) {
-            const realSpots: ParkingSpot[] = results.map((place, index) => ({
-              id: 1000 + index, // Unique ID for real spots
-              name: place.name || `Parking ${index + 1}`,
-              address: place.formatted_address || place.vicinity || `${selectedCity}, Poland`,
-              available: Math.floor(Math.random() * 50) + 10, // Simulated availability
-              total: Math.floor(Math.random() * 100) + 50,
-              price: Math.random() > 0.5 ? '3 PLN/h' : 'Free',
-              type: 'street',
-              rating: (place.rating || 4.0) + (Math.random() * 0.5),
-              lastUpdated: 'Just updated',
-              coordinates: {
-                lat: place.geometry.location.lat(),
-                lng: place.geometry.location.lng()
-              },
-              features: ['Real-time Data', 'Google Maps', 'Verified Location'],
-              images: [],
-              isRealSpot: true
-            }));
-            resolve(realSpots);
-          } else {
-            console.log('No real parking spots found, using demo data only');
-            resolve([]);
-          }
-        });
+      let allResults: any[] = [];
+      
+      // Search with multiple queries
+      for (const searchQuery of searchQueries) {
+        try {
+          const searchRequest = {
+            query: searchQuery,
+            type: ['parking', 'establishment'],
+            location: userLocation || { lat: 54.3520, lng: 18.6466 },
+            radius: 2000, // 2km search radius for better coverage
+            maxResults: 10
+          };
+
+          const results = await new Promise<any[]>((resolve, reject) => {
+            service.textSearch(searchRequest, (results: any[], status: any) => {
+              if (status === google.maps.places.PlacesServiceStatus.OK && results) {
+                resolve(results);
+              } else {
+                resolve([]);
+              }
+            });
+          });
+
+          allResults = [...allResults, ...results];
+        } catch (error) {
+          console.log(`Search failed for query: ${searchQuery}`, error);
+        }
+      }
+
+      // Remove duplicates based on place_id
+      const uniqueResults = allResults.filter((place, index, self) => 
+        index === self.findIndex(p => p.place_id === place.place_id)
+      );
+
+      if (uniqueResults.length === 0) {
+        console.log('No real parking spots found, using demo data only');
+        return [];
+      }
+
+      // Convert to ParkingSpot format with realistic data
+      const realSpots: ParkingSpot[] = uniqueResults.map((place, index) => {
+        // Generate realistic availability based on time and location
+        const hour = new Date().getHours();
+        let availability = Math.floor(Math.random() * 50) + 10;
+        
+        // Adjust availability based on time of day
+        if (hour >= 8 && hour <= 18) {
+          // Business hours - lower availability
+          availability = Math.floor(Math.random() * 30) + 5;
+        } else if (hour >= 19 && hour <= 23) {
+          // Evening - medium availability
+          availability = Math.floor(Math.random() * 40) + 10;
+        } else {
+          // Night/early morning - higher availability
+          availability = Math.floor(Math.random() * 60) + 20;
+        }
+
+        // Generate realistic pricing based on location type
+        let price = "Free";
+        if (place.types?.includes('shopping_mall') || place.types?.includes('establishment')) {
+          price = Math.random() > 0.3 ? "3 PLN/h" : "4 PLN/h";
+        } else if (place.types?.includes('parking')) {
+          price = Math.random() > 0.5 ? "2 PLN/h" : "3 PLN/h";
+        } else if (place.types?.includes('transit_station')) {
+          price = Math.random() > 0.4 ? "4 PLN/h" : "5 PLN/h";
+        }
+
+        // Generate realistic features based on place type
+        const features = [];
+        if (place.types?.includes('shopping_mall')) {
+          features.push('Covered', 'Security', 'Free WiFi', 'Family Friendly');
+        } else if (place.types?.includes('transit_station')) {
+          features.push('Covered', 'Security', '24/7', 'Cameras');
+        } else if (place.types?.includes('establishment')) {
+          features.push('Security', 'Business Area');
+        } else {
+          features.push('Security', 'Verified Location');
+        }
+
+        // Add random features
+        if (Math.random() > 0.7) features.push('EV Charging');
+        if (Math.random() > 0.8) features.push('Disabled Access');
+        if (Math.random() > 0.6) features.push('Lighting');
+
+        return {
+          id: 1000 + index, // Unique ID for real spots
+          name: place.name || `Parking ${index + 1}`,
+          address: place.formatted_address || place.vicinity || `${selectedCity}, Poland`,
+          available: availability,
+          total: Math.floor(availability * (1.5 + Math.random() * 1.5)), // Realistic total capacity
+          price: price,
+          type: place.types?.includes('shopping_mall') ? 'mall' : 
+                place.types?.includes('transit_station') ? 'transport' : 
+                place.types?.includes('establishment') ? 'office' : 'street',
+          rating: (place.rating || 4.0) + (Math.random() * 0.5 - 0.25), // Slight variation
+          lastUpdated: 'Just updated',
+          coordinates: {
+            lat: place.geometry.location.lat(),
+            lng: place.geometry.location.lng()
+          },
+          features: features,
+          images: [],
+          isRealSpot: true
+        };
       });
+
+      console.log(`✅ Found ${realSpots.length} real parking spots from Google Maps`);
+      return realSpots;
     } catch (error) {
       console.error('Error fetching real parking spots:', error);
       return [];
@@ -665,13 +1206,13 @@ const App: React.FC = () => {
               type="text"
               value={destination}
               onChange={(e) => setDestination(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && findNearbyParking()}
+              onKeyPress={(e) => e.key === 'Enter' && findNearbyParking(destination)}
               placeholder="Enter destination name..."
               className="search-input"
               disabled={loading}
             />
             <button
-              onClick={findNearbyParking}
+              onClick={() => findNearbyParking(destination)}
               className="search-button"
               disabled={loading || !destination.trim()}
             >
@@ -735,13 +1276,13 @@ const App: React.FC = () => {
             </button>
           </div>
           
-          {viewMode === 'list' && (
-            <ParkingList 
-              spots={nearbySpots}
-              onSpotClick={openSpotDetails}
-              userContributions={userContributions}
-            />
-          )}
+          {/* Parking List View */}
+                  {viewMode === 'list' && (
+                    <ParkingList
+                      parkingSpots={nearbySpots}
+                      onSpotSelect={openSpotDetails}
+                    />
+                  )}
         </div>
       )}
       
