@@ -7,6 +7,7 @@ interface MapProps {
   selectedSpot?: number | null;
   onSpotSelect?: (spotId: number) => void;
   userLocation?: { lat: number; lng: number } | null;
+  selectedDestination?: { name: string; coordinates: { lat: number; lng: number } } | null;
 }
 
 const Map: React.FC<MapProps> = ({ parkingSpots, selectedSpot, onSpotSelect, userLocation }) => {
@@ -59,6 +60,67 @@ const Map: React.FC<MapProps> = ({ parkingSpots, selectedSpot, onSpotSelect, use
     
     const newMarkers: google.maps.Marker[] = [];
     const newInfoWindows: google.maps.InfoWindow[] = [];
+
+    // Add destination marker if selected
+    if (selectedDestination) {
+      const destinationMarker = new window.google.maps.Marker({
+        map: mapInstance,
+        position: selectedDestination.coordinates,
+        icon: {
+          url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
+            <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="20" cy="20" r="18" fill="#1A202C" stroke="white" stroke-width="3"/>
+              <text x="20" y="26" text-anchor="middle" font-size="16" fill="white" font-weight="bold">🎯</text>
+            </svg>
+          `)}`,
+          scaledSize: { width: 40, height: 40 },
+          anchor: { x: 20, y: 20 }
+        },
+        title: `Destination: ${selectedDestination.name}`,
+        optimized: true
+      });
+      
+      // Create destination info window
+      const destinationInfoWindow = new window.google.maps.InfoWindow({
+        content: `
+          <div style="
+            padding: 16px;
+            max-width: 280px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+          ">
+            <h3 style="
+              margin: 0 0 8px 0;
+              font-size: 18px;
+              font-weight: 600;
+              color: #1A202C;
+            ">🎯 Destination</h3>
+            <p style="
+              margin: 0 0 12px 0;
+              font-size: 16px;
+              color: #1A202C;
+              font-weight: 500;
+            ">${selectedDestination.name}</p>
+            <div style="
+              background: #E0F2F7;
+              padding: 12px;
+              border-radius: 8px;
+              border: 1px solid #1A202C;
+              font-size: 14px;
+              color: #1A202C;
+            ">
+              This is where you want to go. Look for parking spots nearby!
+            </div>
+          </div>
+        `,
+        maxWidth: 300
+      });
+      
+      // Show destination info window by default
+      destinationInfoWindow.open(mapInstance, destinationMarker);
+      
+      newMarkers.push(destinationMarker);
+      newInfoWindows.push(destinationInfoWindow);
+    }
 
     parkingSpots.forEach((spot: ParkingSpot, index: number) => {
       // Create marker icon

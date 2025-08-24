@@ -6,7 +6,6 @@ import { ParkingSpot } from './types/ParkingSpot';
 // Import new components
 import LoginForm from './components/LoginForm';
 import Header from './components/Header';
-import SearchSection from './components/SearchSection';
 import ParkingList from './components/ParkingList';
 import ParkingDetails from './components/ParkingDetails';
 import Map from './components/Map';
@@ -31,6 +30,8 @@ const App: React.FC = () => {
   const [detailsSpotId, setDetailsSpotId] = useState<number | null>(null);
   const [showDetails, setShowDetails] = useState(false);
   const [userContributions, setUserContributions] = useState<ParkingSpot[]>([]);
+  const [recentSearches, setRecentSearches] = useState<string[]>([]);
+  const [selectedDestination, setSelectedDestination] = useState<{ name: string; coordinates: { lat: number; lng: number } } | null>(null);
 
   // Available cities
   const availableCities = [
@@ -428,6 +429,11 @@ const App: React.FC = () => {
     setLoading(true);
     setShowResults(true);
     
+    // Add to recent searches
+    if (!recentSearches.includes(destination.trim())) {
+      setRecentSearches(prev => [destination.trim(), ...prev.slice(0, 4)]); // Keep last 5 searches
+    }
+    
     try {
       // Simulate API call delay
       await new Promise(resolve => setTimeout(resolve, 1000));
@@ -438,7 +444,7 @@ const App: React.FC = () => {
       // Combine real spots with demo spots
       const allSpots = [...allParkingSpots, ...realSpots];
       
-      // Calculate distances and filter by 500m range
+      // Calculate distances and filter by 500m-1000m range
       const spotsWithDistance = allSpots
         .map(spot => ({
           ...spot,
@@ -449,7 +455,7 @@ const App: React.FC = () => {
             spot.coordinates.lng
           )
         }))
-        .filter(spot => spot.distance <= 0.5) // 500 meters = 0.5 km
+        .filter(spot => spot.distance >= 0.5 && spot.distance <= 1.0) // 500m to 1000m range
         .sort((a, b) => a.distance - b.distance);
       
       setNearbySpots(spotsWithDistance);
@@ -458,12 +464,33 @@ const App: React.FC = () => {
       // Fallback to demo spots only
       const spotsWithDistance = allParkingSpots.map(spot => ({
         ...spot,
-        distance: Math.random() * 2 + 0.1
+        distance: Math.random() * 0.5 + 0.5 // 500m to 1000m range
       }));
       setNearbySpots(spotsWithDistance);
     } finally {
       setLoading(false);
     }
+  };
+
+  // Handle destination selection
+  const handleDestinationSelect = (destinationName: string, coordinates: { lat: number; lng: number }) => {
+    setSelectedDestination({ name: destinationName, coordinates });
+    setDestination(destinationName);
+    // Center map on selected destination
+    if (userLocation) {
+      // You can add map centering logic here
+    }
+  };
+
+  // Get directions/route
+  const getDirections = () => {
+    if (!selectedDestination || !userLocation) return;
+    
+    // Open Google Maps with directions
+    const origin = `${userLocation.lat},${userLocation.lng}`;
+    const destination = `${selectedDestination.coordinates.lat},${selectedDestination.coordinates.lng}`;
+    const url = `https://www.google.com/maps/dir/${origin}/${destination}`;
+    window.open(url, '_blank');
   };
 
   // Get real parking spots from Google Maps API
@@ -597,35 +624,117 @@ const App: React.FC = () => {
         availableCities={availableCities}
       />
       
-      <SearchSection 
-        destination={destination}
-        onDestinationChange={setDestination}
-        onSearch={findNearbyParking}
-        loading={loading}
-        viewMode={viewMode}
-        onViewModeChange={setViewMode}
-      />
+      {/* City Selection Banner */}
+      <div className="city-banner">
+        <div className="city-info">
+          <span className="city-label">📍 Current City:</span>
+          <span className="city-name">{availableCities.find(c => c.id === selectedCity)?.name || 'Gdańsk'}</span>
+          <button 
+            className="change-city-btn"
+            onClick={() => setShowCitySelection(true)}
+          >
+            Change City
+          </button>
+        </div>
+      </div>
       
-      {/* Map always visible on home page */}
+      {/* Map Section - Always Visible */}
       <div className="map-section">
         <Map 
           parkingSpots={nearbySpots.length > 0 ? nearbySpots : allParkingSpots}
           userLocation={userLocation}
           onSpotSelect={openSpotDetails}
+          selectedDestination={selectedDestination}
         />
       </div>
       
-      {showResults && (
-        <>
+      {/* Search Section - Under Map */}
+      <div className="search-section-new">
+        <div className="search-container">
+          <h3>🔍 Where are you planning to go?</h3>
+          <div className="search-input-group">
+            <input
+              type="text"
+              value={destination}
+              onChange={(e) => setDestination(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && findNearbyParking()}
+              placeholder="Enter destination name..."
+              className="search-input"
+              disabled={loading}
+            />
+            <button
+              onClick={findNearbyParking}
+              className="search-button"
+              disabled={loading || !destination.trim()}
+            >
+              {loading ? 'Searching...' : 'Find Parking'}
+            </button>
+          </div>
           
-          {viewMode === 'list' ? (
+          {/* Selected Destination Actions */}
+          {selectedDestination && (
+            <div className="destination-actions">
+              <span className="selected-destination">
+                🎯 {selectedDestination.name}
+              </span>
+              <button 
+                className="directions-btn"
+                onClick={getDirections}
+              >
+                🗺️ Get Directions
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+      
+      {/* Recent Searches */}
+      <div className="recent-searches">
+        <h3>📚 Recent Searches</h3>
+        <div className="search-tags">
+          {recentSearches.length > 0 ? (
+            recentSearches.map((search, index) => (
+              <button
+                key={index}
+                className="search-tag"
+                onClick={() => setDestination(search)}
+              >
+                {search}
+              </button>
+            ))
+          ) : (
+            <p className="no-recent">No recent searches yet</p>
+          )}
+        </div>
+      </div>
+      
+      {/* Search Results */}
+      {showResults && nearbySpots.length > 0 && (
+        <div className="results-section">
+          <h3>🚗 Nearby Parking Spots (500m - 1000m)</h3>
+          <div className="view-toggle">
+            <button
+              className={`toggle-button ${viewMode === 'list' ? 'active' : ''}`}
+              onClick={() => setViewMode('list')}
+            >
+              List View
+            </button>
+            <button
+              className={`toggle-button ${viewMode === 'map' ? 'active' : ''}`}
+              onClick={() => setViewMode('map')}
+            >
+              Map View
+            </button>
+          </div>
+          
+          {viewMode === 'list' && (
             <ParkingList 
               spots={nearbySpots}
               onSpotClick={openSpotDetails}
               userContributions={userContributions}
             />
-          ) : null}
-        </>
+          )}
+        </div>
       )}
       
       {/* Modals */}
