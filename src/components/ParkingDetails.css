@@ -278,6 +278,9 @@
   background: #1E3A8A;
   color: white;
 }
+
+.availability-badge.available {
+  display: inline-flex;
   align-items: center;
   gap: 8px;
   padding: 8px 16px;
