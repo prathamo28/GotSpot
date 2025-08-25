@@ -467,6 +467,45 @@ body {
   border: 1px solid #BBF7D0;
 }
 
+/* Refresh Section */
+.refresh-section {
+  margin-top: 20px;
+  text-align: center;
+  padding: 16px;
+  background: #F8FAFC;
+  border-radius: 12px;
+  border: 1px solid #E2E8F0;
+}
+
+.refresh-btn {
+  background: #1E3A8A;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 8px;
+}
+
+.refresh-btn:hover:not(:disabled) {
+  background: #1E40AF;
+  transform: translateY(-1px);
+}
+
+.refresh-btn:disabled {
+  background: #CBD5E0;
+  cursor: not-allowed;
+}
+
+.refresh-info {
+  display: block;
+  font-size: 12px;
+  color: #475569;
+  font-style: italic;
+}
+
 /* Responsive utilities */
 @media (max-width: 480px) {
   .app-container {

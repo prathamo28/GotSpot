@@ -147,12 +147,13 @@ const Map: React.FC<MapProps> = ({ parkingSpots, selectedSpot, onSpotSelect, use
 
     parkingSpots.forEach((spot: ParkingSpot, index: number) => {
       try {
-        // Create marker icon
+        // Create marker icon based on availability and data source
         const markerIcon = {
           url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
             <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
               <circle cx="16" cy="16" r="14" fill="${spot.available > 0 ? '#10b981' : '#ef4444'}" stroke="white" stroke-width="2"/>
-              <text x="16" y="20" text-anchor="middle" font-size="14" fill="white" font-weight="bold">P</text>
+              <text x="16" y="20" text-anchor="middle" font-size="14" fill="white" font-weight="bold">${spot.isRealSpot ? 'G' : 'P'}</text>
+              ${spot.isRealSpot ? '<circle cx="26" cy="6" r="4" fill="#1E3A8A" stroke="white" stroke-width="1"/>' : ''}
             </svg>
           `)}`,
           scaledSize: { width: 32, height: 32 },
@@ -451,7 +452,7 @@ const Map: React.FC<MapProps> = ({ parkingSpots, selectedSpot, onSpotSelect, use
           }}></div>
           <span style={{ color: '#0F172A' }}>Available</span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
           <div style={{
             width: '16px',
             height: '16px',
@@ -460,6 +461,26 @@ const Map: React.FC<MapProps> = ({ parkingSpots, selectedSpot, onSpotSelect, use
             border: '2px solid #FFFFFF' /* White for card/secondary background */
           }}></div>
           <span style={{ color: '#0F172A' }}>Full</span>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+          <div style={{
+            width: '16px',
+            height: '16px',
+            background: '#1E3A8A', /* Deep Navy Blue for real data indicator */
+            borderRadius: '50%',
+            border: '2px solid #FFFFFF' /* White for card/secondary background */
+          }}></div>
+          <span style={{ color: '#0F172A' }}>Real Data</span>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div style={{
+            width: '16px',
+            height: '16px',
+            background: '#CBD5E0', /* Gray for demo data */
+            borderRadius: '50%',
+            border: '2px solid #FFFFFF' /* White for card/secondary background */
+          }}></div>
+          <span style={{ color: '#0F172A' }}>Demo Data</span>
         </div>
       </div>
     </div>

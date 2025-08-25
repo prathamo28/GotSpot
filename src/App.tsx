@@ -779,6 +779,25 @@ const App: React.FC = () => {
       );
     }
 
+    // Load real parking spots on startup
+    const loadInitialRealParkingSpots = async () => {
+      if (!(window as any).google?.maps?.places) return;
+      
+      try {
+        console.log('🔍 Loading initial real parking spots...');
+        const realSpots = await getRealParkingSpots('Gdańsk');
+        
+        if (realSpots.length > 0) {
+          // Combine with demo spots and set as initial data
+          const combinedSpots = [...realSpots, ...allParkingSpots];
+          setNearbySpots(combinedSpots);
+          console.log(`✅ Loaded ${realSpots.length} real spots on startup`);
+        }
+      } catch (error) {
+        console.error('Error loading initial real parking spots:', error);
+      }
+    };
+
     // Load Google Maps API immediately when app starts
     const loadGoogleMaps = async () => {
       try {
@@ -802,6 +821,12 @@ const App: React.FC = () => {
         // Make it globally available
         (window as any).google = google;
         setIsGoogleMapsReady(true); // Set ready state
+        
+        // Load real parking spots after API is ready
+        setTimeout(() => {
+          loadInitialRealParkingSpots();
+        }, 1000); // Small delay to ensure API is fully ready
+        
       } catch (error) {
         console.error('❌ Failed to load Google Maps API:', error);
       }
@@ -895,9 +920,8 @@ const App: React.FC = () => {
           // Now search for parking around this destination
           await findNearbyParking(destination, destinationCoords);
         } else {
-          // Fallback to demo data only
-          setNearbySpots(allParkingSpots);
-          setShowResults(true);
+          // Fallback: search for parking spots with the destination name
+          await findNearbyParking(destination);
         }
       } else {
         // Google Maps not available, use demo data
@@ -906,9 +930,8 @@ const App: React.FC = () => {
       }
     } catch (error) {
       console.error('Search failed:', error);
-      // Fallback to demo data
-      setNearbySpots(allParkingSpots);
-      setShowResults(true);
+      // Fallback: search for parking spots with the destination name
+      await findNearbyParking(destination);
     } finally {
       setLoading(false);
     }
@@ -1006,50 +1029,92 @@ const App: React.FC = () => {
 
     try {
       const google = (window as any).google;
-      const service = new google.maps.places.PlacesService(document.createElement('div'));
       
-      // Multiple search strategies for better results
+      // Create a proper map instance for PlacesService (required for some API calls)
+      const mapDiv = document.createElement('div');
+      const map = new google.maps.Map(mapDiv, {
+        center: userLocation || { lat: 54.3520, lng: 18.6466 },
+        zoom: 14
+      });
+      
+      const service = new google.maps.places.PlacesService(map);
+      
+      // More comprehensive search strategies
       const searchQueries = [
-        `parking near ${query}, ${selectedCity}, Poland`,
-        `parking garage ${query}, ${selectedCity}, Poland`,
-        `parking lot ${query}, ${selectedCity}, Poland`,
-        `car park ${query}, ${selectedCity}, Poland`,
-        `parking space ${query}, ${selectedCity}, Poland`
+        `parking`,
+        `parking garage`,
+        `parking lot`,
+        `car park`,
+        `parking space`,
+        `parking area`
       ];
 
       let allResults: any[] = [];
       
-      // Search with multiple queries
+      // Search with multiple queries and different strategies
       for (const searchQuery of searchQueries) {
         try {
-          const searchRequest = {
-            query: searchQuery,
+          // Strategy 1: Text search
+          const textSearchRequest = {
+            query: `${searchQuery} near ${query}, ${selectedCity}, Poland`,
             type: ['parking', 'establishment'],
             location: userLocation || { lat: 54.3520, lng: 18.6466 },
-            radius: 2000, // 2km search radius for better coverage
-            maxResults: 10
+            radius: 3000, // 3km search radius for better coverage
+            maxResults: 20
           };
 
-          const results = await new Promise<any[]>((resolve, reject) => {
-            service.textSearch(searchRequest, (results: any[], status: any) => {
+          const textResults = await new Promise<any[]>((resolve, reject) => {
+            service.textSearch(textSearchRequest, (results: any[], status: any) => {
               if (status === google.maps.places.PlacesServiceStatus.OK && results) {
+                console.log(`Text search for "${searchQuery}" returned ${results.length} results`);
                 resolve(results);
               } else {
+                console.log(`Text search for "${searchQuery}" failed with status: ${status}`);
                 resolve([]);
               }
             });
           });
 
-          allResults = [...allResults, ...results];
+          allResults = [...allResults, ...textResults];
+
+          // Strategy 2: Nearby search
+          const nearbySearchRequest = {
+            location: userLocation || { lat: 54.3520, lng: 18.6466 },
+            radius: 3000,
+            type: ['parking'],
+            keyword: searchQuery
+          };
+
+          const nearbyResults = await new Promise<any[]>((resolve, reject) => {
+            service.nearbySearch(nearbySearchRequest, (results: any[], status: any) => {
+              if (status === google.maps.places.PlacesServiceStatus.OK && results) {
+                console.log(`Nearby search for "${searchQuery}" returned ${results.length} results`);
+                resolve(results);
+              } else {
+                console.log(`Nearby search for "${searchQuery}" failed with status: ${status}`);
+                resolve([]);
+              }
+            });
+          });
+
+          allResults = [...allResults, ...nearbyResults];
+
         } catch (error) {
           console.log(`Search failed for query: ${searchQuery}`, error);
         }
       }
 
-      // Remove duplicates based on place_id
-      const uniqueResults = allResults.filter((place, index, self) => 
-        index === self.findIndex(p => p.place_id === place.place_id)
-      );
+      // Remove duplicates based on place_id and coordinates
+      const uniqueResults = allResults.filter((place, index, self) => {
+        const firstIndex = self.findIndex(p => 
+          p.place_id === place.place_id || 
+          (p.geometry?.location?.lat() === place.geometry?.location?.lat() && 
+           p.geometry?.location?.lng() === place.geometry?.location?.lng())
+        );
+        return index === firstIndex;
+      });
+
+      console.log(`Total unique results found: ${uniqueResults.length}`);
 
       if (uniqueResults.length === 0) {
         console.log('No real parking spots found, using demo data only');
@@ -1092,6 +1157,8 @@ const App: React.FC = () => {
           features.push('Covered', 'Security', '24/7', 'Cameras');
         } else if (place.types?.includes('establishment')) {
           features.push('Security', 'Business Area');
+        } else if (place.types?.includes('parking')) {
+          features.push('Security', 'Verified Parking');
         } else {
           features.push('Security', 'Verified Location');
         }
@@ -1101,6 +1168,18 @@ const App: React.FC = () => {
         if (Math.random() > 0.8) features.push('Disabled Access');
         if (Math.random() > 0.6) features.push('Lighting');
 
+        // Determine parking type
+        let parkingType: ParkingSpot['type'] = 'street';
+        if (place.types?.includes('shopping_mall')) {
+          parkingType = 'mall';
+        } else if (place.types?.includes('transit_station')) {
+          parkingType = 'transport';
+        } else if (place.types?.includes('establishment')) {
+          parkingType = 'office';
+        } else if (place.types?.includes('parking')) {
+          parkingType = 'public';
+        }
+
         return {
           id: 1000 + index, // Unique ID for real spots
           name: place.name || `Parking ${index + 1}`,
@@ -1108,9 +1187,7 @@ const App: React.FC = () => {
           available: availability,
           total: Math.floor(availability * (1.5 + Math.random() * 1.5)), // Realistic total capacity
           price: price,
-          type: place.types?.includes('shopping_mall') ? 'mall' : 
-                place.types?.includes('transit_station') ? 'transport' : 
-                place.types?.includes('establishment') ? 'office' : 'street',
+          type: parkingType,
           rating: (place.rating || 4.0) + (Math.random() * 0.5 - 0.25), // Slight variation
           lastUpdated: 'Just updated',
           coordinates: {
@@ -1124,6 +1201,7 @@ const App: React.FC = () => {
       });
 
       console.log(`✅ Found ${realSpots.length} real parking spots from Google Maps`);
+      console.log('Real spots details:', realSpots.map(spot => ({ name: spot.name, type: spot.type, coordinates: spot.coordinates })));
       return realSpots;
     } catch (error) {
       console.error('Error fetching real parking spots:', error);
@@ -1275,6 +1353,35 @@ const App: React.FC = () => {
               </button>
             </div>
           )}
+          
+          {/* Refresh Real Data Button */}
+          <div className="refresh-section">
+            <button 
+              className="refresh-btn"
+              onClick={async () => {
+                setLoading(true);
+                try {
+                  const realSpots = await getRealParkingSpots('Gdańsk');
+                  if (realSpots.length > 0) {
+                    const combinedSpots = [...realSpots, ...allParkingSpots];
+                    setNearbySpots(combinedSpots);
+                    setShowResults(true);
+                    alert(`✅ Found ${realSpots.length} real parking spots from Google Maps!`);
+                  } else {
+                    alert('No real parking spots found. Using demo data.');
+                  }
+                } catch (error) {
+                  alert('Error refreshing real data. Using demo data.');
+                } finally {
+                  setLoading(false);
+                }
+              }}
+              disabled={loading}
+            >
+              🔄 Refresh Real Parking Data
+            </button>
+            <span className="refresh-info">Get latest parking spots from Google Maps</span>
+          </div>
         </div>
       </div>
       
