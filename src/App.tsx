@@ -781,20 +781,30 @@ const App: React.FC = () => {
 
     // Load real parking spots on startup
     const loadInitialRealParkingSpots = async () => {
-      if (!(window as any).google?.maps?.places) return;
+      if (!(window as any).google?.maps?.places) {
+        console.log('⚠️ Google Places API not available yet, skipping initial load');
+        return;
+      }
       
       try {
-        console.log('🔍 Loading initial real parking spots...');
+        console.log('🔍 Loading initial real parking spots on startup...');
+        console.log('📍 Searching around ZASPA area (Gdańsk)...');
         const realSpots = await getRealParkingSpots('Gdańsk');
         
         if (realSpots.length > 0) {
           // Combine with demo spots and set as initial data
           const combinedSpots = [...realSpots, ...allParkingSpots];
           setNearbySpots(combinedSpots);
-          console.log(`✅ Loaded ${realSpots.length} real spots on startup`);
+          setShowResults(true);
+          console.log(`✅ Successfully loaded ${realSpots.length} real spots on startup`);
+          console.log('🎯 Real spots found:', realSpots.map(spot => ({ name: spot.name, address: spot.address })));
+        } else {
+          console.log('❌ No real parking spots found on startup, using demo data only');
+          setNearbySpots(allParkingSpots);
         }
       } catch (error) {
-        console.error('Error loading initial real parking spots:', error);
+        console.error('❌ Error loading initial real parking spots:', error);
+        setNearbySpots(allParkingSpots);
       }
     };
 
@@ -1045,11 +1055,10 @@ const App: React.FC = () => {
       
       let allResults: any[] = [];
       
-      // Strategy 1: Direct nearby search for parking
+      // Strategy 1: Direct nearby search for parking (ranked by distance)
       try {
         const nearbySearchRequest = {
           location: searchCenter,
-          radius: 5000, // 5km radius to cover the visible area
           type: ['parking'],
           rankBy: google.maps.places.RankBy.DISTANCE
         };
@@ -1070,6 +1079,34 @@ const App: React.FC = () => {
         allResults = [...allResults, ...nearbyResults];
       } catch (error) {
         console.log('Nearby search error:', error);
+      }
+
+      // Strategy 1b: Fallback nearby search with radius (if rankBy fails)
+      if (allResults.length === 0) {
+        try {
+          console.log('🔄 Trying fallback nearby search with radius...');
+          const fallbackNearbyRequest = {
+            location: searchCenter,
+            radius: 5000,
+            type: ['parking']
+          };
+
+          const fallbackResults = await new Promise<any[]>((resolve, reject) => {
+            service.nearbySearch(fallbackNearbyRequest, (results: any[], status: any) => {
+              if (status === google.maps.places.PlacesServiceStatus.OK && results) {
+                console.log(`✅ Fallback nearby search found ${results.length} parking spots`);
+                resolve(results);
+              } else {
+                console.log(`❌ Fallback nearby search failed: ${status}`);
+                resolve([]);
+              }
+            });
+          });
+          
+          allResults = [...allResults, ...fallbackResults];
+        } catch (error) {
+          console.log('Fallback nearby search error:', error);
+        }
       }
 
       // Strategy 2: Text search with broader terms
