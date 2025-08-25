@@ -1057,6 +1057,7 @@ const App: React.FC = () => {
       
       // Strategy 1: Direct nearby search for parking (ranked by distance)
       try {
+        console.log('🔍 Strategy 1: Nearby search with rankBy DISTANCE...');
         const nearbySearchRequest = {
           location: searchCenter,
           type: ['parking'],
@@ -1084,7 +1085,7 @@ const App: React.FC = () => {
       // Strategy 1b: Fallback nearby search with radius (if rankBy fails)
       if (allResults.length === 0) {
         try {
-          console.log('🔄 Trying fallback nearby search with radius...');
+          console.log('🔄 Strategy 1b: Fallback nearby search with radius...');
           const fallbackNearbyRequest = {
             location: searchCenter,
             radius: 5000,
