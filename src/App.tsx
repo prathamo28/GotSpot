@@ -1030,7 +1030,7 @@ const App: React.FC = () => {
     }
   };
 
-  // Get real parking spots from Google Maps API
+  // Get real parking spots from Google Maps API using new Place API
   const getRealParkingSpots = async (query: string): Promise<ParkingSpot[]> => {
     if (!(window as any).google?.maps?.places) {
       console.log('Google Places API not available, using demo data only');
@@ -1040,139 +1040,148 @@ const App: React.FC = () => {
     try {
       const google = (window as any).google;
       console.log('🔍 Starting Google Places API search for parking spots...');
-      
-      // Create a proper map instance for PlacesService
-      const mapDiv = document.createElement('div');
-      const map = new google.maps.Map(mapDiv, {
-        center: userLocation || { lat: 54.3520, lng: 18.6466 },
-        zoom: 14
-      });
-      
-      const service = new google.maps.places.PlacesService(map);
+      console.log('🆕 Using new google.maps.places.Place API...');
       
       // Use the actual search center from the image (around ZASPA area)
       const searchCenter = { lat: 54.3780, lng: 18.6120 }; // ZASPA area coordinates
       
       let allResults: any[] = [];
       
-      // Strategy 1: Direct nearby search for parking (ranked by distance)
+      // Strategy 1: Use the new Place API with text search
       try {
-        console.log('🔍 Strategy 1: Nearby search with rankBy DISTANCE...');
-        const nearbySearchRequest = {
-          location: searchCenter,
-          type: ['parking'],
-          rankBy: google.maps.places.RankBy.DISTANCE
-        };
-
-        const nearbyResults = await new Promise<any[]>((resolve, reject) => {
-          service.nearbySearch(nearbySearchRequest, (results: any[], status: any) => {
-            console.log(`Nearby search status: ${status}`);
-            if (status === google.maps.places.PlacesServiceStatus.OK && results) {
-              console.log(`✅ Nearby search found ${results.length} parking spots`);
-              resolve(results);
-            } else {
-              console.log(`❌ Nearby search failed: ${status}`);
-              resolve([]);
-            }
-          });
-        });
+        console.log('🔍 Strategy 1: Text search using new Place API...');
         
-        allResults = [...allResults, ...nearbyResults];
+        const searchQueries = [
+          'parking',
+          'parking lot',
+          'car park',
+          'parking garage',
+          'parking space'
+        ];
+
+        for (const term of searchQueries) {
+          try {
+            // Use the new Place API approach
+            const searchRequest = {
+              textQuery: `${term} in Gdańsk`,
+              locationBias: {
+                center: searchCenter,
+                radius: 5000
+              },
+              maxResultCount: 20
+            };
+
+            // Create a new Place instance for searching
+            const place = new google.maps.places.Place(searchRequest);
+            
+            const searchResults = await place.search();
+            console.log(`✅ Text search for "${term}" found ${searchResults.length} results`);
+            
+            if (searchResults.length > 0) {
+              allResults = [...allResults, ...searchResults];
+            }
+          } catch (error) {
+            console.log(`Text search error for "${term}":`, error);
+          }
+        }
       } catch (error) {
-        console.log('Nearby search error:', error);
+        console.log('Strategy 1 error:', error);
       }
 
-      // Strategy 1b: Fallback nearby search with radius (if rankBy fails)
+      // Strategy 2: Fallback to basic text search if Place API fails
       if (allResults.length === 0) {
         try {
-          console.log('🔄 Strategy 1b: Fallback nearby search with radius...');
-          const fallbackNearbyRequest = {
-            location: searchCenter,
-            radius: 5000,
-            type: ['parking']
-          };
-
-          const fallbackResults = await new Promise<any[]>((resolve, reject) => {
-            service.nearbySearch(fallbackNearbyRequest, (results: any[], status: any) => {
-              if (status === google.maps.places.PlacesServiceStatus.OK && results) {
-                console.log(`✅ Fallback nearby search found ${results.length} parking spots`);
-                resolve(results);
-              } else {
-                console.log(`❌ Fallback nearby search failed: ${status}`);
-                resolve([]);
-              }
-            });
+          console.log('🔄 Strategy 2: Fallback to basic text search...');
+          
+          // Create a simple div for the service (legacy approach as fallback)
+          const mapDiv = document.createElement('div');
+          const map = new google.maps.Map(mapDiv, {
+            center: searchCenter,
+            zoom: 14
           });
           
-          allResults = [...allResults, ...fallbackResults];
-        } catch (error) {
-          console.log('Fallback nearby search error:', error);
-        }
-      }
-
-      // Strategy 2: Text search with broader terms
-      const textSearchTerms = [
-        'parking',
-        'parking lot',
-        'car park',
-        'parking garage',
-        'parking space'
-      ];
-
-      for (const term of textSearchTerms) {
-        try {
-          const textSearchRequest = {
-            query: `${term} in Gdańsk`,
-            location: searchCenter,
-            radius: 5000,
-            maxResults: 20
-          };
-
-          const textResults = await new Promise<any[]>((resolve, reject) => {
-            service.textSearch(textSearchRequest, (results: any[], status: any) => {
-              if (status === google.maps.places.PlacesServiceStatus.OK && results) {
-                console.log(`✅ Text search for "${term}" found ${results.length} results`);
-                resolve(results);
-              } else {
-                console.log(`❌ Text search for "${term}" failed: ${status}`);
-                resolve([]);
-              }
-            });
-          });
+          const service = new google.maps.places.PlacesService(map);
           
-          allResults = [...allResults, ...textResults];
+          const fallbackQueries = [
+            'parking in Gdańsk',
+            'parking lot Gdańsk',
+            'car park Gdańsk'
+          ];
+
+          for (const query of fallbackQueries) {
+            try {
+              const textSearchRequest = {
+                query: query,
+                location: searchCenter,
+                radius: 5000,
+                maxResults: 20
+              };
+
+              const textResults = await new Promise<any[]>((resolve, reject) => {
+                service.textSearch(textSearchRequest, (results: any[], status: any) => {
+                  if (status === google.maps.places.PlacesServiceStatus.OK && results) {
+                    console.log(`✅ Fallback search for "${query}" found ${results.length} results`);
+                    resolve(results);
+                  } else {
+                    console.log(`❌ Fallback search for "${query}" failed: ${status}`);
+                    resolve([]);
+                  }
+                });
+              });
+              
+              allResults = [...allResults, ...textResults];
+            } catch (error) {
+              console.log(`Fallback search error for "${query}":`, error);
+            }
+          }
         } catch (error) {
-          console.log(`Text search error for "${term}":`, error);
+          console.log('Strategy 2 error:', error);
         }
       }
 
       // Strategy 3: Search for specific places that typically have parking
-      const placeTypes = ['shopping_mall', 'transit_station', 'establishment', 'point_of_interest'];
-      
-      for (const placeType of placeTypes) {
+      if (allResults.length === 0) {
         try {
-          const typeSearchRequest = {
-            location: searchCenter,
-            radius: 5000,
-            type: [placeType],
-            keyword: 'parking'
-          };
-
-          const typeResults = await new Promise<any[]>((resolve, reject) => {
-            service.nearbySearch(typeSearchRequest, (results: any[], status: any) => {
-              if (status === google.maps.places.PlacesServiceStatus.OK && results) {
-                console.log(`✅ Type search for "${placeType}" found ${results.length} results`);
-                resolve(results);
-              } else {
-                console.log(`❌ Type search for "${placeType}" failed: ${status}`);
-                resolve([]);
-              }
-            });
+          console.log('🔄 Strategy 3: Searching for establishments with parking...');
+          
+          const mapDiv = document.createElement('div');
+          const map = new google.maps.Map(mapDiv, {
+            center: searchCenter,
+            zoom: 14
           });
           
-          allResults = [...allResults, ...typeResults];
+          const service = new google.maps.places.PlacesService(map);
+          
+          const placeTypes = ['shopping_mall', 'transit_station', 'establishment'];
+          
+          for (const placeType of placeTypes) {
+            try {
+              const typeSearchRequest = {
+                location: searchCenter,
+                radius: 5000,
+                type: [placeType],
+                keyword: 'parking'
+              };
+
+              const typeResults = await new Promise<any[]>((resolve, reject) => {
+                service.nearbySearch(typeSearchRequest, (results: any[], status: any) => {
+                  if (status === google.maps.places.PlacesServiceStatus.OK && results) {
+                    console.log(`✅ Type search for "${placeType}" found ${results.length} results`);
+                    resolve(results);
+                  } else {
+                    console.log(`❌ Type search for "${placeType}" failed: ${status}`);
+                    resolve([]);
+                  }
+                });
+              });
+              
+              allResults = [...allResults, ...typeResults];
+            } catch (error) {
+              console.log(`Type search error for "${placeType}":`, error);
+            }
+          }
         } catch (error) {
-          console.log(`Type search error for "${placeType}":`, error);
+          console.log('Strategy 3 error:', error);
         }
       }
 
@@ -1205,39 +1214,6 @@ const App: React.FC = () => {
       console.log(`Total unique results: ${uniqueResults.length}`);
       console.log(`Parking-related results: ${parkingResults.length}`);
       console.log('Parking results:', parkingResults.map(p => ({ name: p.name, types: p.types, address: p.formatted_address })));
-
-      if (parkingResults.length === 0) {
-        console.log('No parking spots found, trying alternative search...');
-        
-        // Fallback: search for any establishment in the area
-        try {
-          const fallbackRequest = {
-            location: searchCenter,
-            radius: 5000,
-            type: ['establishment'],
-            keyword: 'parking'
-          };
-
-          const fallbackResults = await new Promise<any[]>((resolve, reject) => {
-            service.nearbySearch(fallbackRequest, (results: any[], status: any) => {
-              if (status === google.maps.places.PlacesServiceStatus.OK && results) {
-                console.log(`✅ Fallback search found ${results.length} results`);
-                resolve(results);
-              } else {
-                console.log(`❌ Fallback search failed: ${status}`);
-                resolve([]);
-              }
-            });
-          });
-          
-          if (fallbackResults.length > 0) {
-            console.log('Using fallback results as parking spots');
-            parkingResults.push(...fallbackResults.slice(0, 10)); // Limit to 10 results
-          }
-        } catch (error) {
-          console.log('Fallback search error:', error);
-        }
-      }
 
       if (parkingResults.length === 0) {
         console.log('❌ No real parking spots found from Google Maps API');
