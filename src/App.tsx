@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import './App.css';
 import { Loader } from '@googlemaps/js-api-loader';
 import { ParkingSpot } from './types/ParkingSpot';
@@ -1062,7 +1062,7 @@ const App: React.FC = () => {
         for (const term of searchQueries) {
           try {
             // Use the new Place API approach
-            const searchRequest = {
+      const searchRequest = {
               textQuery: `${term} in Gdańsk`,
               locationBias: {
                 center: searchCenter,
@@ -1114,12 +1114,12 @@ const App: React.FC = () => {
                 query: query,
                 location: searchCenter,
                 radius: 5000,
-                maxResults: 20
-              };
+        maxResults: 20
+      };
 
               const textResults = await new Promise<any[]>((resolve, reject) => {
                 service.textSearch(textSearchRequest, (results: any[], status: any) => {
-                  if (status === google.maps.places.PlacesServiceStatus.OK && results) {
+          if (status === google.maps.places.PlacesServiceStatus.OK && results) {
                     console.log(`✅ Fallback search for "${query}" found ${results.length} results`);
                     resolve(results);
                   } else {
@@ -1274,21 +1274,21 @@ const App: React.FC = () => {
 
         return {
           id: 1000 + index,
-          name: place.name || `Parking ${index + 1}`,
+              name: place.name || `Parking ${index + 1}`,
           address: place.formatted_address || place.vicinity || `Gdańsk, Poland`,
           available: availability,
           total: Math.floor(availability * (1.5 + Math.random() * 1.5)),
           price: price,
           type: parkingType,
           rating: (place.rating || 4.0) + (Math.random() * 0.5 - 0.25),
-          lastUpdated: 'Just updated',
-          coordinates: {
-            lat: place.geometry.location.lat(),
-            lng: place.geometry.location.lng()
-          },
+              lastUpdated: 'Just updated',
+              coordinates: {
+                lat: place.geometry.location.lat(),
+                lng: place.geometry.location.lng()
+              },
           features: features,
-          images: [],
-          isRealSpot: true
+              images: [],
+              isRealSpot: true
         };
       });
 
@@ -1346,6 +1346,24 @@ const App: React.FC = () => {
     [detailsSpotId]
   );
 
+  // Ref to keep focus on destination input
+  const destinationInputRef = useRef<HTMLInputElement | null>(null);
+
+  const handleDestinationInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setDestination(e.target.value);
+    // Ensure input keeps focus even if other components re-render
+    requestAnimationFrame(() => destinationInputRef.current?.focus());
+  };
+
+  const handleDestinationKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    // Prevent key events from bubbling to parent elements that might steal focus
+    e.stopPropagation();
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleSearch();
+    }
+  };
+
   // Render city selection if needed
   if (isAuthenticated && showCitySelection) {
     return (
@@ -1401,12 +1419,12 @@ const App: React.FC = () => {
       {/* Map Section - Always Visible */}
       <div className="map-section">
         {isGoogleMapsReady ? (
-          <Map 
-            parkingSpots={nearbySpots.length > 0 ? nearbySpots : allParkingSpots}
-            userLocation={userLocation}
-            onSpotSelect={openSpotDetails}
+        <Map 
+          parkingSpots={nearbySpots.length > 0 ? nearbySpots : allParkingSpots}
+          userLocation={userLocation}
+          onSpotSelect={openSpotDetails}
             selectedDestination={selectedDestination}
-          />
+        />
         ) : (
           <div className="loading-map">
             <p>Loading Google Maps...</p>
@@ -1422,11 +1440,12 @@ const App: React.FC = () => {
             <input
               type="text"
               value={destination}
-              onChange={(e) => setDestination(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+              onChange={handleDestinationInputChange}
+              onKeyDown={handleDestinationKeyDown}
               placeholder="Enter destination name..."
               className="search-input"
               disabled={loading}
+              ref={destinationInputRef}
             />
             <button
               onClick={handleSearch}
@@ -1533,10 +1552,10 @@ const App: React.FC = () => {
           
           {/* Parking List View */}
                   {viewMode === 'list' && (
-                    <ParkingList
+            <ParkingList 
                       parkingSpots={nearbySpots}
                       onSpotSelect={openSpotDetails}
-                    />
+            />
                   )}
         </div>
       )}
