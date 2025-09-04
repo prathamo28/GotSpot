@@ -1040,60 +1040,74 @@ const App: React.FC = () => {
     try {
       const google = (window as any).google;
       console.log('🔍 Starting Google Places API search for parking spots...');
-      console.log('🆕 Using new google.maps.places.Place API...');
       
       // Use the actual search center from the image (around ZASPA area)
       const searchCenter = { lat: 54.3780, lng: 18.6120 }; // ZASPA area coordinates
       
       let allResults: any[] = [];
       
-      // Strategy 1: Use the new Place API with text search
+      // Strategy 1: Use PlacesService textSearch (more reliable for finding parking)
       try {
-        console.log('🔍 Strategy 1: Text search using new Place API...');
+        console.log('🔍 Strategy 1: Text search using PlacesService...');
+        
+        // Create a map instance for PlacesService
+        const mapDiv = document.createElement('div');
+        const map = new google.maps.Map(mapDiv, {
+          center: searchCenter,
+          zoom: 14
+        });
+        
+        const service = new google.maps.places.PlacesService(map);
         
         const searchQueries = [
-          'parking',
-          'parking lot',
-          'car park',
-          'parking garage',
-          'parking space'
+          'parking in Gdańsk',
+          'parking lot Gdańsk',
+          'car park Gdańsk',
+          'parking garage Gdańsk',
+          'parking space Gdańsk',
+          'parking Gdańsk ZASPA',
+          'parking Gdańsk airport',
+          'parking Gdańsk shopping center',
+          'parking Gdańsk station'
         ];
 
-        for (const term of searchQueries) {
+        for (const searchQuery of searchQueries) {
           try {
-            // Use the new Place API approach
-      const searchRequest = {
-              textQuery: `${term} in Gdańsk`,
-              locationBias: {
-                center: searchCenter,
-                radius: 5000
-              },
-              maxResultCount: 20
+            const textSearchRequest = {
+              query: searchQuery,
+              location: searchCenter,
+              radius: 10000, // 10km radius for broader coverage
+              maxResults: 20
             };
 
-            // Create a new Place instance for searching
-            const place = new google.maps.places.Place(searchRequest);
+            const textResults = await new Promise<any[]>((resolve, reject) => {
+              service.textSearch(textSearchRequest, (results: any[], status: any) => {
+                if (status === google.maps.places.PlacesServiceStatus.OK && results) {
+                  console.log(`✅ Text search for "${searchQuery}" found ${results.length} results`);
+                  resolve(results);
+                } else {
+                  console.log(`❌ Text search for "${searchQuery}" failed: ${status}`);
+                  resolve([]);
+                }
+              });
+            });
             
-            const searchResults = await place.search();
-            console.log(`✅ Text search for "${term}" found ${searchResults.length} results`);
-            
-            if (searchResults.length > 0) {
-              allResults = [...allResults, ...searchResults];
+            if (textResults.length > 0) {
+              allResults = [...allResults, ...textResults];
             }
           } catch (error) {
-            console.log(`Text search error for "${term}":`, error);
+            console.log(`Text search error for "${searchQuery}":`, error);
           }
         }
       } catch (error) {
         console.log('Strategy 1 error:', error);
       }
 
-      // Strategy 2: Fallback to basic text search if Place API fails
-      if (allResults.length === 0) {
+      // Strategy 2: Nearby search for parking establishments
+      if (allResults.length < 10) {
         try {
-          console.log('🔄 Strategy 2: Fallback to basic text search...');
+          console.log('🔄 Strategy 2: Nearby search for parking establishments...');
           
-          // Create a simple div for the service (legacy approach as fallback)
           const mapDiv = document.createElement('div');
           const map = new google.maps.Map(mapDiv, {
             center: searchCenter,
@@ -1102,36 +1116,34 @@ const App: React.FC = () => {
           
           const service = new google.maps.places.PlacesService(map);
           
-          const fallbackQueries = [
-            'parking in Gdańsk',
-            'parking lot Gdańsk',
-            'car park Gdańsk'
-          ];
-
-          for (const query of fallbackQueries) {
+          const placeTypes = ['parking', 'establishment', 'point_of_interest'];
+          
+          for (const placeType of placeTypes) {
             try {
-              const textSearchRequest = {
-                query: query,
+              const nearbySearchRequest = {
                 location: searchCenter,
-                radius: 5000,
-        maxResults: 20
-      };
+                radius: 10000, // 10km radius
+                type: [placeType],
+                keyword: 'parking'
+              };
 
-              const textResults = await new Promise<any[]>((resolve, reject) => {
-                service.textSearch(textSearchRequest, (results: any[], status: any) => {
-          if (status === google.maps.places.PlacesServiceStatus.OK && results) {
-                    console.log(`✅ Fallback search for "${query}" found ${results.length} results`);
+              const nearbyResults = await new Promise<any[]>((resolve, reject) => {
+                service.nearbySearch(nearbySearchRequest, (results: any[], status: any) => {
+                  if (status === google.maps.places.PlacesServiceStatus.OK && results) {
+                    console.log(`✅ Nearby search for "${placeType}" found ${results.length} results`);
                     resolve(results);
                   } else {
-                    console.log(`❌ Fallback search for "${query}" failed: ${status}`);
+                    console.log(`❌ Nearby search for "${placeType}" failed: ${status}`);
                     resolve([]);
                   }
                 });
               });
               
-              allResults = [...allResults, ...textResults];
+              if (nearbyResults.length > 0) {
+                allResults = [...allResults, ...nearbyResults];
+              }
             } catch (error) {
-              console.log(`Fallback search error for "${query}":`, error);
+              console.log(`Nearby search error for "${placeType}":`, error);
             }
           }
         } catch (error) {
@@ -1139,10 +1151,10 @@ const App: React.FC = () => {
         }
       }
 
-      // Strategy 3: Search for specific places that typically have parking
-      if (allResults.length === 0) {
+      // Strategy 3: Search for specific known parking locations in Gdańsk
+      if (allResults.length < 15) {
         try {
-          console.log('🔄 Strategy 3: Searching for establishments with parking...');
+          console.log('🔄 Strategy 3: Searching for known Gdańsk parking locations...');
           
           const mapDiv = document.createElement('div');
           const map = new google.maps.Map(mapDiv, {
@@ -1152,32 +1164,44 @@ const App: React.FC = () => {
           
           const service = new google.maps.places.PlacesService(map);
           
-          const placeTypes = ['shopping_mall', 'transit_station', 'establishment'];
-          
-          for (const placeType of placeTypes) {
+          const knownLocations = [
+            'Gdańsk Airport Parking',
+            'Gdańsk Główny Station Parking',
+            'Forum Gdańsk Parking',
+            'Manhattan Shopping Center Parking',
+            'Galeria Bałtycka Parking',
+            'Oliwa Park Parking',
+            'Gdańsk Zoo Parking',
+            'Gdańsk University Parking',
+            'Medical University of Gdańsk Parking'
+          ];
+
+          for (const location of knownLocations) {
             try {
-              const typeSearchRequest = {
+              const textSearchRequest = {
+                query: location,
                 location: searchCenter,
-                radius: 5000,
-                type: [placeType],
-                keyword: 'parking'
+                radius: 15000, // 15km radius
+                maxResults: 5
               };
 
-              const typeResults = await new Promise<any[]>((resolve, reject) => {
-                service.nearbySearch(typeSearchRequest, (results: any[], status: any) => {
+              const locationResults = await new Promise<any[]>((resolve, reject) => {
+                service.textSearch(textSearchRequest, (results: any[], status: any) => {
                   if (status === google.maps.places.PlacesServiceStatus.OK && results) {
-                    console.log(`✅ Type search for "${placeType}" found ${results.length} results`);
+                    console.log(`✅ Location search for "${location}" found ${results.length} results`);
                     resolve(results);
                   } else {
-                    console.log(`❌ Type search for "${placeType}" failed: ${status}`);
+                    console.log(`❌ Location search for "${location}" failed: ${status}`);
                     resolve([]);
                   }
                 });
               });
               
-              allResults = [...allResults, ...typeResults];
+              if (locationResults.length > 0) {
+                allResults = [...allResults, ...locationResults];
+              }
             } catch (error) {
-              console.log(`Type search error for "${placeType}":`, error);
+              console.log(`Location search error for "${location}":`, error);
             }
           }
         } catch (error) {
@@ -1195,19 +1219,26 @@ const App: React.FC = () => {
         return index === firstIndex;
       });
 
-      // Filter for parking-related results
+      // More lenient filtering for parking-related results
       const parkingResults = uniqueResults.filter(place => {
         const name = place.name?.toLowerCase() || '';
         const types = place.types || [];
         const address = place.formatted_address?.toLowerCase() || '';
         
+        // Accept more results as potential parking spots
         return (
           name.includes('parking') ||
           name.includes('park') ||
           name.includes('car') ||
+          name.includes('lotnisko') || // Polish for airport
+          name.includes('dworzec') || // Polish for station
+          name.includes('centrum') || // Polish for center
           types.includes('parking') ||
+          types.includes('establishment') ||
+          types.includes('point_of_interest') ||
           address.includes('parking') ||
-          address.includes('park')
+          address.includes('park') ||
+          address.includes('gdańsk') // Accept any place in Gdańsk
         );
       });
 
@@ -1234,22 +1265,26 @@ const App: React.FC = () => {
           availability = Math.floor(Math.random() * 60) + 20;
         }
 
-        // Generate realistic pricing
+        // Generate realistic pricing based on location type
         let price = "Free";
-        if (place.types?.includes('shopping_mall')) {
+        if (place.types?.includes('shopping_mall') || place.name?.toLowerCase().includes('shopping')) {
           price = Math.random() > 0.3 ? "3 PLN/h" : "4 PLN/h";
-        } else if (place.types?.includes('transit_station')) {
+        } else if (place.types?.includes('transit_station') || place.name?.toLowerCase().includes('station')) {
           price = Math.random() > 0.4 ? "4 PLN/h" : "5 PLN/h";
+        } else if (place.name?.toLowerCase().includes('airport') || place.name?.toLowerCase().includes('lotnisko')) {
+          price = Math.random() > 0.3 ? "6 PLN/h" : "8 PLN/h";
         } else if (place.types?.includes('establishment')) {
           price = Math.random() > 0.5 ? "2 PLN/h" : "3 PLN/h";
         }
 
         // Generate features based on place type
         const features = [];
-        if (place.types?.includes('shopping_mall')) {
+        if (place.types?.includes('shopping_mall') || place.name?.toLowerCase().includes('shopping')) {
           features.push('Covered', 'Security', 'Free WiFi', 'Family Friendly');
-        } else if (place.types?.includes('transit_station')) {
+        } else if (place.types?.includes('transit_station') || place.name?.toLowerCase().includes('station')) {
           features.push('Covered', 'Security', '24/7', 'Cameras');
+        } else if (place.name?.toLowerCase().includes('airport') || place.name?.toLowerCase().includes('lotnisko')) {
+          features.push('Covered', 'Security', '24/7', 'Cameras', 'Lighting', 'Premium');
         } else if (place.types?.includes('establishment')) {
           features.push('Security', 'Business Area');
         } else {
@@ -1262,9 +1297,11 @@ const App: React.FC = () => {
 
         // Determine parking type
         let parkingType: ParkingSpot['type'] = 'street';
-        if (place.types?.includes('shopping_mall')) {
+        if (place.types?.includes('shopping_mall') || place.name?.toLowerCase().includes('shopping')) {
           parkingType = 'mall';
-        } else if (place.types?.includes('transit_station')) {
+        } else if (place.types?.includes('transit_station') || place.name?.toLowerCase().includes('station')) {
+          parkingType = 'transport';
+        } else if (place.name?.toLowerCase().includes('airport') || place.name?.toLowerCase().includes('lotnisko')) {
           parkingType = 'transport';
         } else if (place.types?.includes('establishment')) {
           parkingType = 'office';
@@ -1274,21 +1311,21 @@ const App: React.FC = () => {
 
         return {
           id: 1000 + index,
-              name: place.name || `Parking ${index + 1}`,
+          name: place.name || `Parking ${index + 1}`,
           address: place.formatted_address || place.vicinity || `Gdańsk, Poland`,
           available: availability,
           total: Math.floor(availability * (1.5 + Math.random() * 1.5)),
           price: price,
           type: parkingType,
           rating: (place.rating || 4.0) + (Math.random() * 0.5 - 0.25),
-              lastUpdated: 'Just updated',
-              coordinates: {
-                lat: place.geometry.location.lat(),
-                lng: place.geometry.location.lng()
-              },
+          lastUpdated: 'Just updated',
+          coordinates: {
+            lat: place.geometry.location.lat(),
+            lng: place.geometry.location.lng()
+          },
           features: features,
-              images: [],
-              isRealSpot: true
+          images: [],
+          isRealSpot: true
         };
       });
 

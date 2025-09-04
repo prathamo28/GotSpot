@@ -17,16 +17,41 @@
   box-shadow: 0 2px 12px rgba(15, 23, 42, 0.06);
   position: relative;
   overflow: hidden;
+  user-select: none; /* Prevent text selection on click */
 }
 
 .parking-item:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(30, 58, 138, 0.15);
   border-color: #1E40AF; /* Slightly lighter navy for hover */
+  background: #F8FAFC; /* Light background on hover */
 }
 
 .parking-item:active {
   transform: translateY(0);
+  background: #E2E8F0; /* Darker background when clicked */
+}
+
+.parking-item:focus {
+  outline: 2px solid #1E40AF;
+  outline-offset: 2px;
+}
+
+/* Add a subtle indicator that items are clickable */
+.parking-item::after {
+  content: '👆 Click to view details';
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  font-size: 11px;
+  color: #1E3A8A;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.parking-item:hover::after {
+  opacity: 1;
 }
 
 .parking-header {
