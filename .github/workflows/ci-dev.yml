@@ -30,8 +30,25 @@ jobs:
 
       - name: Install dependencies
         run: |
-          cd backend && npm ci
-          cd ../mobile-app && npm ci
+          # Install backend dependencies
+          cd backend
+          if [ -f package-lock.json ]; then
+            echo "🔍 Checking package-lock.json sync..."
+            npm ci --dry-run || (echo "⚠️ Package lock out of sync, regenerating..." && rm package-lock.json && npm install)
+          else
+            echo "📦 No package-lock.json found, running npm install..."
+            npm install
+          fi
+          
+          # Install mobile-app dependencies
+          cd ../mobile-app
+          if [ -f package-lock.json ]; then
+            echo "🔍 Checking package-lock.json sync..."
+            npm ci --dry-run || (echo "⚠️ Package lock out of sync, regenerating..." && rm package-lock.json && npm install)
+          else
+            echo "📦 No package-lock.json found, running npm install..."
+            npm install
+          fi
 
       - name: Run security audit
         run: |
@@ -76,8 +93,25 @@ jobs:
 
       - name: Install dependencies
         run: |
-          cd backend && npm ci
-          cd ../mobile-app && npm ci
+          # Install backend dependencies
+          cd backend
+          if [ -f package-lock.json ]; then
+            echo "🔍 Checking package-lock.json sync..."
+            npm ci --dry-run || (echo "⚠️ Package lock out of sync, regenerating..." && rm package-lock.json && npm install)
+          else
+            echo "📦 No package-lock.json found, running npm install..."
+            npm install
+          fi
+          
+          # Install mobile-app dependencies
+          cd ../mobile-app
+          if [ -f package-lock.json ]; then
+            echo "🔍 Checking package-lock.json sync..."
+            npm ci --dry-run || (echo "⚠️ Package lock out of sync, regenerating..." && rm package-lock.json && npm install)
+          else
+            echo "📦 No package-lock.json found, running npm install..."
+            npm install
+          fi
 
       - name: Run tests
         run: |
