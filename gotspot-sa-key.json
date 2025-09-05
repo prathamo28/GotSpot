@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "gotspot-pilot-project",
+  "private_key_id": "839c9acfda110045018c51d0e44165a032f570ba",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDRCnjgBlR2AsuW\nKoC5dXS276EkX5qWS+nCyJdt5Ejcd09fSx+9ZUyJ7uxV0R+sQVllcC/e1T49MlIk\n7rXJdwZ/UjV62A7qeMxM1qblvtmXeKVvKIaUhLMS0GIhGDRmN1kxdQ/9Tvnctewh\noaijHeTrvau6MiwYoH0gI4NKkskn7Royu/MTrgf7ikPKLfj6d6CnvvNZ6+bFLeEU\neMRztd1eMi5Pw7U3BlaxsOAzz0Fe+wmE8yTwsjj5+VJ4ksU4Z85rKGei3wN+MO/1\nDL06f25QQLwgIsTY2MY6E6gPXK9oV556OwxBSe0dg+pTLu2uc1u16Os1AlBZWDVZ\nnojxODg3AgMBAAECggEAFNewDz/FhbHoDddVcY7K54wjZQNwEzKk4oCQy93KTGRM\nMnqRdf2qEMnhucZZtUy1I4gScQVez0gIW+ZXk17RJwcejfQ87uP2FGZsMNWpz5B+\nVJ1impK6LoYLqRqthTa/jehxT7BjX75D02Nq83I0Z2Z7jA60ltmc02q3DH7WNhGG\nLOjhiAmawljLXvSUpXlmYiPVkZroTMkOEh9bEq8s8tU/r2yskMvt6xuRvLWTP5u6\nXuXa7VfgeQPTuX9jo3eEuLqzemrQ83HAGmcU2/EJsFANWWZRRIDhheI2WjtdP34V\nlvV9WsRMXge8tKv0qIXcVB2bXq0w5ktGFLAGBNvfAQKBgQDzrs9tyCyESXoAvemp\nqaVj54o1gmP0UYu//U0DO3CfJntqjbYvnMdb5dy31fYZxM+fQ0zEXNmR4bjTt08L\nIrNVxDMNsXRCSvFi6BCkljqnGv4Bh0Qz9m5n5d1dydDKyBRMlKOab9T5I4VuqVwA\nRSULv3OOxmNOBfQwZagDoj8OnQKBgQDbm2eRKznyDVEqjGTju5XY4efXFBCV4UbQ\nCpwRgBSdawdG9biuEePDO8k/vJcWeX0jwoTFH0UuVMLhJc//7YbEfVvszGAHeVkc\nvznuZltf2j0NuLHEnQDS5//HBquRlWnb+rh/eSIujqTtItcTOODNULWx09VPSkNw\nxTZqKcpf4wKBgQDQG014owgpnZp8wbOouoHNlTK6SfXU9ENWHhvEE+I1eKbTs9yQ\nQuMav27E7Qw0q5jomZAY7na8mDnBTX5Ks0LWjy1Ol2sDJn+JiUiVVtsWVP3yDjQX\n8HAPeQaZDz6pvz9eu14RCUqnzkco36f7bxGZO9KTbyflvT3yiw52s/wIHQKBgQCf\nrSts3mVPnmc57MMe4zJddETCmhBFKnv2oQBBqUNUApJUAi66Qr+9ISd/dHzXFpbq\n/XDUc5w1x+O7GWdXyzmGfS/tydy5En687D4PHdWqqGBkLbr0HsSOlang6PSu8lj6\nXh7wcP9tosJAumhvzZeHMfwqxMAA2xqWUI70OlavyQKBgQClGw0bnxfdI8NjFsSC\nwstuCz43bK0Nz3On55DE+LB+rdAboysl1s+SaqBvZOEjcKeVA7iVMYxp7kLZTaYq\nVoqqaFnnz/c/hUP9URMfYerUcAYuc9rdAAE+xCv3Gi68NC8jUnGfZcq9OkjiA2e1\nVUnOka9q9OdY/Alnpuc0IioPgg==\n-----END PRIVATE KEY-----\n",
+  "client_email": "gotspot-github-actions@gotspot-pilot-project.iam.gserviceaccount.com",
+  "client_id": "114706340678966992712",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/gotspot-github-actions%40gotspot-pilot-project.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
