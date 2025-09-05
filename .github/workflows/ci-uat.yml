@@ -49,9 +49,12 @@ jobs:
 
       - name: Run comprehensive security audit
         run: |
-          echo "🔍 Running comprehensive security audit..."
-          cd backend && npm audit --audit-level=high --json > npm-audit-backend.json
-          cd ../mobile-app && npm audit --audit-level=high --json > npm-audit-mobile.json
+          chmod +x scripts/security-audit.sh
+          ./scripts/security-audit.sh
+          
+          # Generate JSON reports for detailed analysis
+          cd backend && npm audit --audit-level=high --json > npm-audit-backend.json || true
+          cd ../mobile-app && npm audit --audit-level=high --json > npm-audit-mobile.json || true
 
       - name: Run Snyk security scan
         uses: snyk/actions/node@master
