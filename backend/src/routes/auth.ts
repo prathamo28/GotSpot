@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 import { getAuth } from 'firebase-admin/auth';
 import { logger } from '../utils/logger';
 
-const router = express.Router();
+const router: express.Router = express.Router();
 
 // Login endpoint
 router.post('/login', async (req, res) => {

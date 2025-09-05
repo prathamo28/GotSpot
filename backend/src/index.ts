@@ -21,7 +21,7 @@ import { logger } from './utils/logger';
 
 dotenv.config();
 
-const app = express();
+const app: express.Application = express();
 const PORT = process.env.PORT || 3000;
 
 // Initialize Firebase Admin
