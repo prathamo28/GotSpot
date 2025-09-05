@@ -90,23 +90,36 @@ npm start
 npm run build
 ```
 
-## 🌐 Deployment
+## 🚀 One-Click Deployment
 
-### Option 1: Vercel (Recommended)
-1. Push code to GitHub
-2. Connect Vercel to your repository
-3. Deploy automatically
+### Complete GCP Infrastructure
+```bash
+# Deploy everything to Google Cloud
+deploy-all.bat
 
-### Option 2: Netlify
-1. Build the project: `npm run build`
-2. Drag `build` folder to Netlify
-3. Configure custom domain if needed
+# Delete everything (stops all costs)
+delete-all.bat
 
-### Option 3: GitHub Pages
-1. Add `"homepage": "https://username.github.io/repo-name"` to package.json
-2. Install gh-pages: `npm install --save-dev gh-pages`
-3. Add deploy scripts to package.json
-4. Run `npm run deploy`
+# Check deployment status
+check-status.bat
+
+# Monitor costs
+check-costs.bat
+```
+
+### What Gets Deployed
+- ✅ **Backend API** → Google Cloud Run
+- ✅ **Database** → Firestore
+- ✅ **Storage** → Cloud Storage
+- ✅ **Frontend** → Vercel
+- ✅ **Mobile App** → Expo Build
+- ✅ **Infrastructure** → Terraform
+
+### Quick Start
+1. **Configure** `infrastructure/terraform/terraform.tfvars`
+2. **Run** `deploy-all.bat`
+3. **Access** your app at the provided URLs
+4. **Delete** with `delete-all.bat` when done
 
 ## 📊 Market Opportunity
 

@@ -1,4 +1,4 @@
-# GotSpot Infrastructure as Code
+# GotSpot Complete Infrastructure as Code
 terraform {
   required_version = ">= 1.0"
   required_providers {
@@ -39,6 +39,18 @@ variable "environment" {
   default     = "dev"
 }
 
+variable "google_maps_api_key" {
+  description = "Google Maps API Key"
+  type        = string
+  sensitive   = true
+}
+
+variable "jwt_secret" {
+  description = "JWT Secret Key"
+  type        = string
+  sensitive   = true
+}
+
 # Enable required APIs
 resource "google_project_service" "required_apis" {
   for_each = toset([
@@ -48,6 +60,10 @@ resource "google_project_service" "required_apis" {
     "cloudbuild.googleapis.com",
     "logging.googleapis.com",
     "monitoring.googleapis.com",
+    "maps.googleapis.com",
+    "places.googleapis.com",
+    "geocoding.googleapis.com",
+    "directions.googleapis.com",
     "maps-backend.googleapis.com",
     "places-backend.googleapis.com",
     "geocoding-backend.googleapis.com",
@@ -55,6 +71,32 @@ resource "google_project_service" "required_apis" {
 
   service = each.value
   disable_on_destroy = false
+}
+
+# Service Account for Cloud Run
+resource "google_service_account" "gotspot_api" {
+  account_id   = "gotspot-api"
+  display_name = "GotSpot API Service Account"
+  description  = "Service account for GotSpot API"
+}
+
+# IAM Bindings for Service Account
+resource "google_project_iam_member" "firestore_user" {
+  project = var.project_id
+  role    = "roles/firestore.user"
+  member  = "serviceAccount:${google_service_account.gotspot_api.email}"
+}
+
+resource "google_project_iam_member" "storage_object_viewer" {
+  project = var.project_id
+  role    = "roles/storage.objectViewer"
+  member  = "serviceAccount:${google_service_account.gotspot_api.email}"
+}
+
+resource "google_project_iam_member" "maps_api_user" {
+  project = var.project_id
+  role    = "roles/maps.placesApiUser"
+  member  = "serviceAccount:${google_service_account.gotspot_api.email}"
 }
 
 # Firestore Database
