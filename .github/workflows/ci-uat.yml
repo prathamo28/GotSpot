@@ -201,8 +201,8 @@ jobs:
         run: |
           cd infrastructure/terraform
           terraform init
-          terraform plan -var="environment=uat"
-          terraform apply -auto-approve -var="environment=uat"
+          terraform plan -var-file="environments/uat.tfvars" -out=tfplan
+          terraform apply -auto-approve -var-file="environments/uat.tfvars"
 
       - name: Deploy to Cloud Run
         run: |
