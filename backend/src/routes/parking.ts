@@ -73,7 +73,7 @@ router.get('/search', async (req, res) => {
       lng: parseFloat(lng as string)
     } : undefined;
 
-    const spots = await parkingDataService.searchParkingSpots(query as string, location);
+    const spots = await parkingDataService.searchParkingSpots(query as string, location || { lat: 54.3520, lng: 18.6466 });
     
     logger.info(`Found ${spots.length} parking spots for query: ${query}`);
     res.json(spots);

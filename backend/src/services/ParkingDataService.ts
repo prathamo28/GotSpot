@@ -180,7 +180,7 @@ export class ParkingDataService {
     }
 
     // Generate features based on place type
-    const features = [];
+    const features: string[] = [];
     if (place.types?.includes('shopping_mall') || place.name?.toLowerCase().includes('shopping')) {
       features.push('Covered', 'Security', 'Free WiFi', 'Family Friendly');
     } else if (place.types?.includes('transit_station') || place.name?.toLowerCase().includes('station')) {
