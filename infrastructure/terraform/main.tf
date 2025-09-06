@@ -224,7 +224,7 @@ resource "google_monitoring_alert_policy" "gotspot_errors" {
     condition_threshold {
       filter          = "resource.type=cloud_run_revision AND resource.labels.service_name=gotspot-api"
       duration        = "300s"
-      comparison      = "COMPARISON_GREATER_THAN"
+      comparison      = "COMPARISON_GT"
       threshold_value = 0.05
       aggregations {
         alignment_period   = "60s"
@@ -242,7 +242,7 @@ resource "google_monitoring_alert_policy" "gotspot_latency" {
     condition_threshold {
       filter          = "resource.type=cloud_run_revision AND resource.labels.service_name=gotspot-api"
       duration        = "300s"
-      comparison      = "COMPARISON_GREATER_THAN"
+      comparison      = "COMPARISON_GT"
       threshold_value = 2.0
       aggregations {
         alignment_period   = "60s"
@@ -261,7 +261,7 @@ resource "google_monitoring_alert_policy" "gotspot_cost" {
     condition_threshold {
       filter          = "resource.type=billing_account"
       duration        = "300s"
-      comparison      = "COMPARISON_GREATER_THAN"
+      comparison      = "COMPARISON_GT"
       threshold_value = 50.0
       aggregations {
         alignment_period   = "86400s"
