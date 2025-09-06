@@ -34,3 +34,15 @@ variable "jwt_secret" {
   sensitive   = true
   default     = "your-jwt-secret-here"
 }
+
+variable "github_owner" {
+  description = "GitHub repository owner"
+  type        = string
+  default     = "prathamo28"
+}
+
+variable "github_repo" {
+  description = "GitHub repository name"
+  type        = string
+  default     = "GotSpot"
+}

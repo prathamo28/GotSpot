@@ -15,41 +15,7 @@ provider "google" {
   zone    = var.zone
 }
 
-# Variables
-variable "project_id" {
-  description = "GCP Project ID"
-  type        = string
-}
-
-variable "region" {
-  description = "GCP Region"
-  type        = string
-  default     = "europe-west1"
-}
-
-variable "zone" {
-  description = "GCP Zone"
-  type        = string
-  default     = "europe-west1-b"
-}
-
-variable "environment" {
-  description = "Environment (dev, staging, prod)"
-  type        = string
-  default     = "dev"
-}
-
-variable "google_maps_api_key" {
-  description = "Google Maps API Key"
-  type        = string
-  sensitive   = true
-}
-
-variable "jwt_secret" {
-  description = "JWT Secret Key"
-  type        = string
-  sensitive   = true
-}
+# Variables are defined in variables.tf
 
 # Enable required APIs
 resource "google_project_service" "required_apis" {
@@ -151,6 +117,7 @@ resource "google_cloud_run_service" "gotspot_api" {
     spec {
       container_concurrency = 100
       timeout_seconds      = 300
+      service_account_name = google_service_account.gotspot_api.email
 
       containers {
         image = "gcr.io/${var.project_id}/gotspot-api:latest"
