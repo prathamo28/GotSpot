@@ -107,15 +107,15 @@ resource "google_cloud_run_service" "gotspot_api" {
   template {
     metadata {
       annotations = {
-        "autoscaling.knative.dev/maxScale" = "10"
-        "autoscaling.knative.dev/minScale" = "0"
+        "autoscaling.knative.dev/maxScale" = tostring(var.cloud_run_config.max_instances)
+        "autoscaling.knative.dev/minScale" = tostring(var.cloud_run_config.min_instances)
         "run.googleapis.com/cpu-throttling" = "true"
         "run.googleapis.com/execution-environment" = "gen2"
       }
     }
 
     spec {
-      container_concurrency = 100
+      container_concurrency = var.security_config.rate_limit
       timeout_seconds      = 300
       service_account_name = google_service_account.gotspot_api.email
 
@@ -124,8 +124,8 @@ resource "google_cloud_run_service" "gotspot_api" {
 
         resources {
           limits = {
-            cpu    = "1"
-            memory = "512Mi"
+            cpu    = var.cloud_run_config.cpu
+            memory = var.cloud_run_config.memory
           }
           requests = {
             cpu    = "0.5"
@@ -133,6 +133,7 @@ resource "google_cloud_run_service" "gotspot_api" {
           }
         }
 
+        # Core environment variables
         env {
           name  = "NODE_ENV"
           value = var.environment
@@ -153,8 +154,17 @@ resource "google_cloud_run_service" "gotspot_api" {
           value = var.jwt_secret
         }
 
+        # Additional environment variables from config
+        dynamic "env" {
+          for_each = var.environment_variables
+          content {
+            name  = env.key
+            value = env.value
+          }
+        }
+
         ports {
-          container_port = 8080
+          container_port = var.cloud_run_config.port
         }
       }
     }
