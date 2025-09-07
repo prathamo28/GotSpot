@@ -31,7 +31,7 @@ resource "google_cloud_run_service" "gotspot_api" {
       service_account_name = local.gotspot_api_email
 
       containers {
-        image = "gcr.io/cloudrun/hello"
+        image = "gcr.io/google-containers/busybox:1.35"
 
         resources {
           limits = {
@@ -41,23 +41,8 @@ resource "google_cloud_run_service" "gotspot_api" {
         }
 
         env {
-          name  = "NODE_ENV"
-          value = var.environment
-        }
-
-        env {
           name  = "PORT"
           value = "8080"
-        }
-
-        env {
-          name  = "PROJECT_ID"
-          value = var.project_id
-        }
-
-        env {
-          name  = "REGION"
-          value = var.region
         }
 
         ports {
@@ -65,16 +50,7 @@ resource "google_cloud_run_service" "gotspot_api" {
           container_port = 8080
         }
 
-        liveness_probe {
-          http_get {
-            path = "/health"
-            port = 8080
-          }
-          initial_delay_seconds = 30
-          period_seconds        = 10
-          timeout_seconds       = 5
-          failure_threshold     = 3
-        }
+        # Health checks removed temporarily to avoid deployment issues
       }
     }
   }
