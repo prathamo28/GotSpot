@@ -17,6 +17,11 @@ provider "google" {
 
 # Variables are defined in variables.tf
 
+# Random ID for unique resource names
+resource "random_id" "bucket_suffix" {
+  byte_length = 4
+}
+
 # Enable required APIs
 resource "google_project_service" "required_apis" {
   for_each = toset([
@@ -28,6 +33,7 @@ resource "google_project_service" "required_apis" {
     "monitoring.googleapis.com",
     "cloudresourcemanager.googleapis.com",
     "iam.googleapis.com",
+    "serviceusage.googleapis.com",
   ])
 
   service = each.value
@@ -39,6 +45,11 @@ resource "google_service_account" "gotspot_api" {
   account_id   = "gotspot-api"
   display_name = "GotSpot API Service Account"
   description  = "Service account for GotSpot API"
+  
+  # Handle existing service account
+  lifecycle {
+    ignore_changes = [account_id]
+  }
 }
 
 # IAM Bindings for Service Account
@@ -67,7 +78,7 @@ resource "google_firestore_database" "gotspot_db" {
 
 # Cloud Storage Bucket
 resource "google_storage_bucket" "gotspot_storage" {
-  name          = "${var.project_id}-gotspot-storage"
+  name          = "${var.project_id}-gotspot-storage-${random_id.bucket_suffix.hex}"
   location      = var.region
   force_destroy = true
 
@@ -187,26 +198,7 @@ data "google_iam_policy" "gotspot_api_policy" {
   }
 }
 
-# Cloud Build Trigger
-resource "google_cloudbuild_trigger" "gotspot_trigger" {
-  name        = "gotspot-api-trigger"
-  description = "Build and deploy GotSpot API"
-
-  github {
-    owner = var.github_owner
-    name  = var.github_repo
-    push {
-      branch = "^main$"
-    }
-  }
-
-  filename = "backend/cloudbuild.yaml"
-
-  substitutions = {
-    _PROJECT_ID = var.project_id
-    _REGION     = var.region
-  }
-}
+# Cloud Build Trigger - Removed for now, will add back later
 
 # Logging sink removed for now - will add back later with proper permissions
 
