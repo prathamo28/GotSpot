@@ -26,13 +26,8 @@ resource "google_project_service" "required_apis" {
     "cloudbuild.googleapis.com",
     "logging.googleapis.com",
     "monitoring.googleapis.com",
-    "maps.googleapis.com",
-    "places.googleapis.com",
-    "geocoding.googleapis.com",
-    "directions.googleapis.com",
-    "maps-backend.googleapis.com",
-    "places-backend.googleapis.com",
-    "geocoding-backend.googleapis.com",
+    "cloudresourcemanager.googleapis.com",
+    "iam.googleapis.com",
   ])
 
   service = each.value
@@ -59,11 +54,7 @@ resource "google_project_iam_member" "storage_object_viewer" {
   member  = "serviceAccount:${google_service_account.gotspot_api.email}"
 }
 
-resource "google_project_iam_member" "maps_api_user" {
-  project = var.project_id
-  role    = "roles/maps.placesApiUser"
-  member  = "serviceAccount:${google_service_account.gotspot_api.email}"
-}
+# Maps API permissions removed - will add back when Maps API is properly configured
 
 # Firestore Database
 resource "google_firestore_database" "gotspot_db" {
@@ -217,69 +208,10 @@ resource "google_cloudbuild_trigger" "gotspot_trigger" {
   }
 }
 
-# Logging
-resource "google_logging_project_sink" "gotspot_logs" {
-  name        = "gotspot-logs"
-  destination = "storage.googleapis.com/${google_storage_bucket.gotspot_storage.name}/logs"
-
-  filter = "resource.type=cloud_run_revision AND resource.labels.service_name=gotspot-api"
-}
+# Logging sink removed for now - will add back later with proper permissions
 
 # Monitoring
-resource "google_monitoring_alert_policy" "gotspot_errors" {
-  display_name = "GotSpot API Errors"
-  combiner     = "OR"
-  conditions {
-    display_name = "Error rate too high"
-    condition_threshold {
-      filter          = "resource.type=cloud_run_revision AND resource.labels.service_name=gotspot-api"
-      duration        = "300s"
-      comparison      = "COMPARISON_GT"
-      threshold_value = 0.05
-      aggregations {
-        alignment_period   = "60s"
-        per_series_aligner = "ALIGN_RATE"
-      }
-    }
-  }
-}
-
-resource "google_monitoring_alert_policy" "gotspot_latency" {
-  display_name = "GotSpot API High Latency"
-  combiner     = "OR"
-  conditions {
-    display_name = "Latency too high"
-    condition_threshold {
-      filter          = "resource.type=cloud_run_revision AND resource.labels.service_name=gotspot-api"
-      duration        = "300s"
-      comparison      = "COMPARISON_GT"
-      threshold_value = 2.0
-      aggregations {
-        alignment_period   = "60s"
-        per_series_aligner = "ALIGN_MEAN"
-      }
-    }
-  }
-}
-
-# Cost Monitoring
-resource "google_monitoring_alert_policy" "gotspot_cost" {
-  display_name = "GotSpot High Cost"
-  combiner     = "OR"
-  conditions {
-    display_name = "Daily cost too high"
-    condition_threshold {
-      filter          = "resource.type=billing_account"
-      duration        = "300s"
-      comparison      = "COMPARISON_GT"
-      threshold_value = 50.0
-      aggregations {
-        alignment_period   = "86400s"
-        per_series_aligner = "ALIGN_SUM"
-      }
-    }
-  }
-}
+# Monitoring policies removed for now - will add back later with proper configuration
 
 # Outputs
 output "api_url" {
