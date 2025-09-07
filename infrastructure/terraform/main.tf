@@ -40,29 +40,34 @@ resource "google_project_service" "required_apis" {
   disable_on_destroy = false
 }
 
-# Service Account for Cloud Run
-resource "google_service_account" "gotspot_api" {
-  account_id   = "gotspot-api"
-  display_name = "GotSpot API Service Account"
-  description  = "Service account for GotSpot API"
-  
-  # Handle existing service account
-  lifecycle {
-    ignore_changes = [account_id]
-  }
+# Service Account for Cloud Run - Use data source for existing account
+data "google_service_account" "gotspot_api" {
+  account_id = "gotspot-api"
+}
+
+# Create a local reference for easier use
+locals {
+  gotspot_api_email = data.google_service_account.gotspot_api.email
 }
 
 # IAM Bindings for Service Account
 resource "google_project_iam_member" "firestore_user" {
   project = var.project_id
   role    = "roles/firestore.user"
-  member  = "serviceAccount:${google_service_account.gotspot_api.email}"
+  member  = "serviceAccount:${local.gotspot_api_email}"
 }
 
 resource "google_project_iam_member" "storage_object_viewer" {
   project = var.project_id
   role    = "roles/storage.objectViewer"
-  member  = "serviceAccount:${google_service_account.gotspot_api.email}"
+  member  = "serviceAccount:${local.gotspot_api_email}"
+}
+
+# Additional role for Firestore database creation
+resource "google_project_iam_member" "firestore_admin" {
+  project = var.project_id
+  role    = "roles/datastore.owner"
+  member  = "serviceAccount:${local.gotspot_api_email}"
 }
 
 # Maps API permissions removed - will add back when Maps API is properly configured
@@ -119,7 +124,7 @@ resource "google_cloud_run_service" "gotspot_api" {
     spec {
       container_concurrency = var.security_config.rate_limit
       timeout_seconds      = 300
-      service_account_name = google_service_account.gotspot_api.email
+      service_account_name = local.gotspot_api_email
 
       containers {
         image = "gcr.io/${var.project_id}/gotspot-api:latest"
