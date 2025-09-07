@@ -51,22 +51,23 @@ locals {
 }
 
 # IAM Bindings for Service Account
-resource "google_project_iam_member" "firestore_user" {
-  project = var.project_id
-  role    = "roles/firestore.user"
-  member  = "serviceAccount:${local.gotspot_api_email}"
-}
-
 resource "google_project_iam_member" "storage_object_viewer" {
   project = var.project_id
   role    = "roles/storage.objectViewer"
   member  = "serviceAccount:${local.gotspot_api_email}"
 }
 
-# Additional role for Firestore database creation
+# Firestore roles - use correct roles for project level
 resource "google_project_iam_member" "firestore_admin" {
   project = var.project_id
   role    = "roles/datastore.owner"
+  member  = "serviceAccount:${local.gotspot_api_email}"
+}
+
+# Additional role for Firestore access
+resource "google_project_iam_member" "firestore_user" {
+  project = var.project_id
+  role    = "roles/datastore.user"
   member  = "serviceAccount:${local.gotspot_api_email}"
 }
 
@@ -78,7 +79,10 @@ resource "google_firestore_database" "gotspot_db" {
   name        = "(default)"
   location_id = var.region
   type        = "FIRESTORE_NATIVE"
-  depends_on  = [google_project_service.required_apis]
+  depends_on  = [
+    google_project_service.required_apis,
+    google_project_iam_member.firestore_admin
+  ]
 }
 
 # Cloud Storage Bucket
@@ -127,7 +131,7 @@ resource "google_cloud_run_service" "gotspot_api" {
       service_account_name = local.gotspot_api_email
 
       containers {
-        image = "gcr.io/${var.project_id}/gotspot-api:latest"
+        image = "gcr.io/cloudrun/hello"
 
         resources {
           limits = {
