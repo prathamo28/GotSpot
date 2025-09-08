@@ -117,6 +117,13 @@ jobs:
           cd infrastructure/terraform
           terraform apply -auto-approve -var-file="environments/dev.tfvars"
 
+      - name: Cleanup on Failure
+        if: failure()
+        run: |
+          echo "Workflow failed, cleaning up resources..."
+          cd infrastructure/terraform
+          terraform destroy -var-file="environments/dev.tfvars" -auto-approve || true
+
       - name: Output infrastructure info
         run: |
           cd infrastructure/terraform
@@ -165,6 +172,13 @@ jobs:
         run: |
           API_URL=$(gcloud run services describe gotspot-api-dev --region=${{ env.REGION }} --format="value(status.url)")
           curl -f $API_URL/health || exit 1
+
+      - name: Cleanup on Failure
+        if: failure()
+        run: |
+          echo "Deploy job failed, cleaning up resources..."
+          cd infrastructure/terraform
+          terraform destroy -var-file="environments/dev.tfvars" -auto-approve || true
 
       - name: Comment deployment status
         uses: actions/github-script@v7

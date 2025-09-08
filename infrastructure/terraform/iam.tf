@@ -18,3 +18,7 @@ resource "google_project_iam_member" "firestore_user" {
   role    = "roles/datastore.user"
   member  = "serviceAccount:${local.gotspot_api_email}"
 }
+
+# Cloud Run Admin role for Terraform service account
+# Note: This needs to be added manually to gotspot-terraform-sa@gotspot-pilot-project.iam.gserviceaccount.com
+# via GCP Console: IAM & Admin → IAM → Add role: Cloud Run Admin

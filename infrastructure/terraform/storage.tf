@@ -1,11 +1,6 @@
-# Random ID for unique resource names
-resource "random_id" "bucket_suffix" {
-  byte_length = 4
-}
-
-# Cloud Storage Bucket
+# Cloud Storage Bucket - Use fixed name to prevent multiple buckets
 resource "google_storage_bucket" "gotspot_storage" {
-  name          = "${var.project_id}-gotspot-storage-${random_id.bucket_suffix.hex}"
+  name          = "${var.project_id}-gotspot-storage"
   location      = var.region
   force_destroy = true
 
