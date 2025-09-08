@@ -40,17 +40,11 @@ resource "google_cloud_run_service" "gotspot_api" {
           }
         }
 
-        env {
-          name  = "PORT"
-          value = "8080"
-        }
-
+        # Health checks removed temporarily to avoid deployment issues
         ports {
           name           = "http1"
           container_port = 8080
         }
-
-        # Health checks removed temporarily to avoid deployment issues
       }
     }
   }
