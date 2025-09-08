@@ -1,9 +1,4 @@
 # Outputs
-output "api_url" {
-  description = "GotSpot API URL"
-  value       = google_cloud_run_service.gotspot_api.status[0].url
-}
-
 output "firestore_database_id" {
   description = "Firestore Database ID"
   value       = local.firestore_database_id
@@ -28,3 +23,9 @@ output "region" {
   description = "GCP Region"
   value       = var.region
 }
+
+# Cloud Run outputs temporarily disabled
+# output "api_url" {
+#   description = "GotSpot API URL"
+#   value       = google_cloud_run_service.gotspot_api.status[0].url
+# }
