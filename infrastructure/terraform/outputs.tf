@@ -6,7 +6,7 @@ output "api_url" {
 
 output "firestore_database_id" {
   description = "Firestore Database ID"
-  value       = data.google_firestore_database.gotspot_db.id
+  value       = google_firestore_database.gotspot_db.id
 }
 
 output "storage_bucket_name" {
