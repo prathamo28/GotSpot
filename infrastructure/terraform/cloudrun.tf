@@ -55,8 +55,7 @@ resource "google_cloud_run_service" "gotspot_api" {
   }
 
   depends_on = [
-    google_project_service.required_apis,
-    google_firestore_database.gotspot_db
+    google_project_service.required_apis
   ]
 }
 
