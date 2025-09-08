@@ -102,10 +102,15 @@ jobs:
         with:
           terraform_version: '1.5.0'
 
+      - name: Create Terraform State Bucket
+        run: |
+          gsutil mb gs://gotspot-terraform-state || true
+          gsutil versioning set on gs://gotspot-terraform-state
+
       - name: Terraform Init
         run: |
           cd infrastructure/terraform
-          terraform init
+          terraform init -backend-config="bucket=gotspot-terraform-state"
 
       - name: Terraform Plan
         run: |
@@ -122,6 +127,7 @@ jobs:
         run: |
           echo "Workflow failed, cleaning up resources..."
           cd infrastructure/terraform
+          terraform init -backend-config="bucket=gotspot-terraform-state" || true
           terraform destroy -var-file="environments/dev.tfvars" -auto-approve || true
 
       - name: Output infrastructure info
@@ -178,6 +184,7 @@ jobs:
         run: |
           echo "Deploy job failed, cleaning up resources..."
           cd infrastructure/terraform
+          terraform init -backend-config="bucket=gotspot-terraform-state" || true
           terraform destroy -var-file="environments/dev.tfvars" -auto-approve || true
 
       - name: Comment deployment status

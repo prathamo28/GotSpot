@@ -22,10 +22,8 @@ resource "google_cloud_run_service" "gotspot_api" {
 }
 
 # IAM Policy for Cloud Run - Allow public access
-resource "google_cloud_run_service_iam_member" "public_access" {
-  location = google_cloud_run_service.gotspot_api.location
-  project  = google_cloud_run_service.gotspot_api.project
-  service  = google_cloud_run_service.gotspot_api.name
-  role     = "roles/run.invoker"
-  member   = "allUsers"
-}
+# Note: This needs to be set manually via GCP Console or gcloud CLI
+# gcloud run services add-iam-policy-binding gotspot-api \
+#   --region=europe-west1 \
+#   --member="allUsers" \
+#   --role="roles/run.invoker"
