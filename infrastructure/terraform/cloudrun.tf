@@ -5,8 +5,7 @@ resource "google_cloud_run_service" "gotspot_api" {
 
   metadata {
     annotations = {
-      "run.googleapis.com/ingress"             = "all"
-      "run.googleapis.com/execution-environment" = "gen2"
+      "run.googleapis.com/ingress" = "all"
     }
     labels = {
       "app"     = "gotspot"
