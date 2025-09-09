@@ -97,15 +97,20 @@ jobs:
           export GOOGLE_APPLICATION_CREDENTIALS=/tmp/gcp-key.json
           echo "GOOGLE_APPLICATION_CREDENTIALS=/tmp/gcp-key.json" >> $GITHUB_ENV
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: '1.5.0'
-
       - name: Create Terraform State Bucket
         run: |
           gcloud storage buckets create gs://gotspot-terraform-state --location=europe-west1 || true
           gcloud storage buckets update gs://gotspot-terraform-state --enable-versioning || true
+
+      - name: Verify State Bucket
+        run: |
+          gcloud storage buckets describe gs://gotspot-terraform-state || exit 1
+          echo "State bucket verified successfully"
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: '1.5.0'
 
       - name: Terraform Init
         run: |
