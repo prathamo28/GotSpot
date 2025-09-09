@@ -104,8 +104,8 @@ jobs:
 
       - name: Create Terraform State Bucket
         run: |
-          gsutil mb gs://gotspot-terraform-state || true
-          gsutil versioning set on gs://gotspot-terraform-state
+          gcloud storage buckets create gs://gotspot-terraform-state --location=europe-west1 || true
+          gcloud storage buckets update gs://gotspot-terraform-state --enable-versioning || true
 
       - name: Terraform Init
         run: |
