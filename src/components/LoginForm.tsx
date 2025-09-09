@@ -2,16 +2,17 @@ import React, { useState } from 'react';
 import './LoginForm.css';
 
 interface LoginFormProps {
-  onLogin: (password: string) => void;
-  loginError: boolean;
+  onLogin: (email: string, password: string) => void;
+  error: string;
 }
 
-const LoginForm: React.FC<LoginFormProps> = ({ onLogin, loginError }) => {
+const LoginForm: React.FC<LoginFormProps> = ({ onLogin, error }) => {
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onLogin(password);
+    onLogin(email, password);
   };
 
   return (
@@ -25,25 +26,37 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, loginError }) => {
         
         <form onSubmit={handleSubmit} className="login-form">
           <div className="input-group">
-            <label htmlFor="password">Demo Password</label>
+            <label htmlFor="email">Email</label>
+            <input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter your email"
+              required
+            />
+          </div>
+          
+          <div className="input-group">
+            <label htmlFor="password">Password</label>
             <input
               id="password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter demo password"
+              placeholder="Enter your password"
               required
             />
           </div>
           
-          {loginError && (
+          {error && (
             <div className="error-message">
-              ❌ Incorrect password. Please try again.
+              {error}
             </div>
           )}
           
           <button type="submit" className="login-button">
-            🚀 Launch Demo
+            Login
           </button>
         </form>
         
