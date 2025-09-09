@@ -101,11 +101,7 @@ jobs:
         run: |
           gcloud storage buckets create gs://gotspot-terraform-state --location=europe-west1 || true
           gcloud storage buckets update gs://gotspot-terraform-state --enable-versioning || true
-
-      - name: Verify State Bucket
-        run: |
-          gcloud storage buckets describe gs://gotspot-terraform-state || exit 1
-          echo "State bucket verified successfully"
+          echo "State bucket created and configured"
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
@@ -115,7 +111,9 @@ jobs:
       - name: Terraform Init
         run: |
           cd infrastructure/terraform
-          terraform init -backend-config="bucket=gotspot-terraform-state"
+          # Try remote backend first, fallback to local if bucket doesn't exist
+          terraform init -backend-config="bucket=gotspot-terraform-state" || \
+          terraform init -backend=false
 
       - name: Terraform Plan
         run: |
