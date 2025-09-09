@@ -121,10 +121,16 @@ jobs:
       - name: Cleanup on Failure
         if: failure()
         run: |
-          echo "Workflow failed, cleaning up resources..."
+          echo "Infrastructure deployment failed, cleaning up resources..."
+          # Clean up Cloud Run service if it exists
+          gcloud run services delete gotspot-api-dev --region=${{ env.REGION }} --quiet || true
+          # Clean up infrastructure using Terraform
           cd infrastructure/terraform
-          terraform init -backend-config="bucket=gotspot-terraform-state" || true
+          echo "Initializing Terraform for cleanup..."
+          terraform init || true
+          echo "Destroying infrastructure resources..."
           terraform destroy -var-file="environments/dev.tfvars" -auto-approve || true
+          echo "Cleanup completed"
 
       - name: Output infrastructure info
         run: |
@@ -178,9 +184,9 @@ jobs:
         if: failure()
         run: |
           echo "Deploy job failed, cleaning up resources..."
-          cd infrastructure/terraform
-          terraform init -backend-config="bucket=gotspot-terraform-state" || true
-          terraform destroy -var-file="environments/dev.tfvars" -auto-approve || true
+          # Clean up Cloud Run service
+          gcloud run services delete gotspot-api-dev --region=${{ env.REGION }} --quiet || true
+          echo "Cloud Run service cleanup completed"
 
       - name: Comment deployment status
         uses: actions/github-script@v7
