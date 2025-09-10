@@ -1,19 +1,32 @@
 import React, { useState } from 'react';
 import './LoginForm.css';
 
+type OnLoginHandler = ((email: string, password: string) => void) | ((password: string) => void);
+
 interface LoginFormProps {
-  onLogin: (email: string, password: string) => void;
-  error: string;
+  onLogin: OnLoginHandler;
+  error?: string;
+  loginError?: boolean;
 }
 
-const LoginForm: React.FC<LoginFormProps> = ({ onLogin, error }) => {
+const LoginForm: React.FC<LoginFormProps> = ({ onLogin, error, loginError }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onLogin(email, password);
+    // Support both (email, password) and (password) signatures
+    const handler = onLogin as any;
+    if (typeof handler === 'function') {
+      if (handler.length && handler.length >= 2) {
+        handler(email, password);
+      } else {
+        handler(password);
+      }
+    }
   };
+
+  const errorMessage = error ?? (loginError ? 'Invalid email or password' : '');
 
   return (
     <div className="login-container">
@@ -49,9 +62,9 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, error }) => {
             />
           </div>
           
-          {error && (
+          {errorMessage && (
             <div className="error-message">
-              {error}
+              {errorMessage}
             </div>
           )}
           
