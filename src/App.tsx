@@ -37,13 +37,7 @@ const App: React.FC = () => {
 
   return (
     <div className="app">
-      <div className="login-container">
-        <div className="logo">
-          <h1>GotSpot</h1>
-          <p>Find parking spots easily</p>
-        </div>
-        <LoginForm onLogin={handleLogin} error={loginError} />
-      </div>
+      <LoginForm onLogin={handleLogin} error={loginError} />
     </div>
   );
 };
