@@ -52,6 +52,15 @@ jobs:
       working-directory: terraform
       run: terraform validate
 
+    - name: Create terraform.tfvars
+      working-directory: terraform
+      run: |
+        cat > terraform.tfvars << 'EOF'
+        project_id  = "${{ env.PROJECT_ID }}"
+        region      = "${{ env.REGION }}"
+        domain_name = "gotspot.com"
+        EOF
+
     - name: Terraform Plan
       working-directory: terraform
       run: terraform plan -var-file="terraform.tfvars" -out=tfplan
