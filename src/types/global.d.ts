@@ -1,5 +1,5 @@
 declare interface ParkingSpot {
-  id: string;
+  id: string | number;
   name: string;
   lat: number;
   lng: number;
