@@ -7,12 +7,6 @@ terraform {
       version = "~> 4.0"
     }
   }
-  
-  # Configure remote state backend
-  backend "gcs" {
-    bucket = "gotspot-terraform-state"
-    prefix = "frontend/state"
-  }
 }
 
 # Configure the Google Cloud Provider
