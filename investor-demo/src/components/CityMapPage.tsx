@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { POLISH_CITIES } from '../data/cities';
+import { POLISH_CITIES } from '../data/cities.ts';
 
 interface CityMapPageProps {
   city: string;
