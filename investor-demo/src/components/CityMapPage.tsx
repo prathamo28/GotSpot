@@ -47,20 +47,15 @@ const CityMapPage: React.FC<CityMapPageProps> = ({ city, onBack }) => {
         'attraction': 'rgba(168, 85, 247, 0.4)' // Purple for attractions
       };
 
-      // Add parking location markers and polygons
+      // Add parking location markers with circular areas
       PARKING_LOCATIONS.forEach((location) => {
-        // Add polygon (rectangle) around parking area
-        const latOffset = 0.01;
-        const lngOffset = 0.015;
-        
-        const polygon = L.rectangle([
-          [location.lat - latOffset, location.lng - lngOffset],
-          [location.lat + latOffset, location.lng + lngOffset]
-        ], {
+        // Add small circle around parking spot (better for mobile)
+        const circle = L.circle([location.lat, location.lng], {
+          radius: 300,
           color: typeColors[location.type] || 'rgba(100, 100, 100, 0.4)',
           fillColor: typeColors[location.type] || 'rgba(100, 100, 100, 0.3)',
-          fillOpacity: 0.6,
-          weight: 2
+          fillOpacity: 0.3,
+          weight: 1
         })
           .bindPopup(`
             <strong>${location.name}</strong><br>
@@ -71,9 +66,21 @@ const CityMapPage: React.FC<CityMapPageProps> = ({ city, onBack }) => {
           `)
           .addTo(mapInstance.current);
 
-        // Add marker on top of polygon
-        const greenIcon = new L.Icon({
-          iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png',
+        // Add colorful marker based on type
+        const markerColors: Record<string, string> = {
+          'mall': 'blue',
+          'office': 'red',
+          'street': 'violet',
+          'university': 'green',
+          'hospital': 'orange',
+          'attraction': 'purple'
+        };
+        
+        const color = markerColors[location.type] || 'green';
+        const iconUrl = `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${color}.png`;
+        
+        const icon = new L.Icon({
+          iconUrl: iconUrl,
           shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
           iconSize: [25, 41],
           iconAnchor: [12, 41],
@@ -81,7 +88,7 @@ const CityMapPage: React.FC<CityMapPageProps> = ({ city, onBack }) => {
           shadowSize: [41, 41]
         });
 
-        const marker = L.marker([location.lat, location.lng], { icon: greenIcon })
+        const marker = L.marker([location.lat, location.lng], { icon })
           .bindPopup(`
             <strong>${location.name}</strong><br>
             Type: ${location.type}<br>
@@ -103,18 +110,16 @@ const CityMapPage: React.FC<CityMapPageProps> = ({ city, onBack }) => {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!searchQuery.trim()) return;
+    if (!searchQuery.trim() || !mapInstance.current) return;
     
     const location = PARKING_LOCATIONS.find(loc => 
       loc.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
     
-    if (location && mapInstance.current) {
-      mapInstance.current.setView([location.lat, location.lng], 15);
-      
-      // Temporarily add a pulsing animation
+    if (location) {
       mapInstance.current.flyTo([location.lat, location.lng], 16, {
-        duration: 0.5
+        duration: 1,
+        easeLinearity: 0.25
       });
     }
   };
@@ -142,16 +147,25 @@ const CityMapPage: React.FC<CityMapPageProps> = ({ city, onBack }) => {
           background: 'white', borderRadius: 16, border: '1px solid #E5E7EB',
           padding: 12, boxShadow: '0 10px 30px rgba(0,0,0,0.15)'
         }}>
-          <form onSubmit={handleSearch}>
+          <form onSubmit={handleSearch} style={{ display: 'flex', gap: 8 }}>
             <input
-              placeholder="Search parking location (e.g. Oliwa, Forum)..."
+              placeholder="Try: Olivia, Forum, Zoo, University..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               style={{
-                width: '100%', padding: '14px 16px', border: '2px solid #E5E7EB',
+                flex: 1, padding: '14px 16px', border: '2px solid #E5E7EB',
                 borderRadius: 12, fontSize: 16
               }}
             />
+            <button
+              type="submit"
+              style={{
+                padding: '14px 24px', background: '#3B82F6', color: 'white',
+                border: 'none', borderRadius: 12, fontWeight: 600, cursor: 'pointer'
+              }}
+            >
+              Search
+            </button>
           </form>
 
           <div style={{ display: 'flex', gap: 12, marginTop: 12 }}>
