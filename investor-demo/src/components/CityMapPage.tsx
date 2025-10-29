@@ -37,25 +37,24 @@ const CityMapPage: React.FC<CityMapPageProps> = ({ city, onBack }) => {
       // Add city center marker
       L.marker([cityInfo.lat, cityInfo.lng]).addTo(mapInstance.current);
 
-      // Color mapping for parking types
-      const typeColors: Record<string, string> = {
-        'mall': 'rgba(59, 130, 246, 0.4)',      // Blue for malls
-        'office': 'rgba(239, 68, 68, 0.4)',     // Red for offices
-        'street': 'rgba(236, 72, 153, 0.4)',    // Pink for street parking
-        'university': 'rgba(34, 197, 94, 0.4)', // Green for universities (cheap)
-        'hospital': 'rgba(251, 146, 60, 0.4)',  // Orange for hospitals
-        'attraction': 'rgba(168, 85, 247, 0.4)' // Purple for attractions
+      // Color mapping based on BUSY LEVEL (not type)
+      const busyColors: Record<string, string> = {
+        'busy': 'rgba(239, 68, 68, 0.5)',     // RED - Very busy (Oliwa office area)
+        'moderate': 'rgba(251, 146, 60, 0.5)', // ORANGE - Moderate
+        'free': 'rgba(34, 197, 94, 0.5)'       // GREEN - Mostly free (Metropolia area)
       };
 
       // Add parking location markers with circular areas
       PARKING_LOCATIONS.forEach((location) => {
         // Add small circle around parking spot (better for mobile)
+        // Color based on BUSY LEVEL
+        const fillColor = busyColors[location.busyLevel] || 'rgba(100, 100, 100, 0.3)';
         const circle = L.circle([location.lat, location.lng], {
           radius: 300,
-          color: typeColors[location.type] || 'rgba(100, 100, 100, 0.4)',
-          fillColor: typeColors[location.type] || 'rgba(100, 100, 100, 0.3)',
-          fillOpacity: 0.3,
-          weight: 1
+          color: fillColor,
+          fillColor: fillColor,
+          fillOpacity: 0.4,
+          weight: 2
         })
           .bindPopup(`
             <strong>${location.name}</strong><br>
@@ -66,18 +65,10 @@ const CityMapPage: React.FC<CityMapPageProps> = ({ city, onBack }) => {
           `)
           .addTo(mapInstance.current);
 
-        // Add colorful marker based on type
-        const markerColors: Record<string, string> = {
-          'mall': 'blue',
-          'office': 'red',
-          'street': 'violet',
-          'university': 'green',
-          'hospital': 'orange',
-          'attraction': 'purple'
-        };
-        
-        const color = markerColors[location.type] || 'green';
-        const iconUrl = `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${color}.png`;
+        // Add colorful marker based on BUSY LEVEL
+        const markerColor = location.busyLevel === 'busy' ? 'red' : 
+                           location.busyLevel === 'moderate' ? 'orange' : 'green';
+        const iconUrl = `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${markerColor}.png`;
         
         const icon = new L.Icon({
           iconUrl: iconUrl,
@@ -180,10 +171,10 @@ const CityMapPage: React.FC<CityMapPageProps> = ({ city, onBack }) => {
           </div>
 
           <div style={{ marginTop: 12, fontSize: 12, color: '#666' }}>
-            <strong>Parking Types:</strong> 
-            <span style={{ margin: '0 8px' }}><span style={{ color: '#3B82F6' }}>Blue</span> = Mall</span>
-            <span style={{ margin: '0 8px' }}><span style={{ color: '#EF4444' }}>Red</span> = Office</span>
-            <span style={{ margin: '0 8px' }}><span style={{ color: '#22C55E' }}>Green</span> = University (Cheap)</span>
+            <strong>Parking Availability:</strong> 
+            <span style={{ margin: '0 8px' }}><span style={{ color: '#EF4444' }}>🔴 Red</span> = Very Busy (Oliwa)</span>
+            <span style={{ margin: '0 8px' }}><span style={{ color: '#F99160' }}>🟠 Orange</span> = Moderate</span>
+            <span style={{ margin: '0 8px' }}><span style={{ color: '#22C55E' }}>🟢 Green</span> = Free (Metropolia)</span>
           </div>
         </div>
       </div>
