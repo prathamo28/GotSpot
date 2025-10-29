@@ -17,6 +17,7 @@ const ensureLeaflet = async () => {
 const CityMapPage: React.FC<CityMapPageProps> = ({ city, onBack }) => {
   const mapRef = useRef<HTMLDivElement | null>(null);
   const mapInstance = useRef<any>(null);
+  const [searchQuery, setSearchQuery] = React.useState('');
 
   useEffect(() => {
     let isMounted = true;
@@ -36,8 +37,41 @@ const CityMapPage: React.FC<CityMapPageProps> = ({ city, onBack }) => {
       // Add city center marker
       L.marker([cityInfo.lat, cityInfo.lng]).addTo(mapInstance.current);
 
-      // Add parking location markers
+      // Color mapping for parking types
+      const typeColors: Record<string, string> = {
+        'mall': 'rgba(59, 130, 246, 0.4)',      // Blue for malls
+        'office': 'rgba(239, 68, 68, 0.4)',     // Red for offices
+        'street': 'rgba(236, 72, 153, 0.4)',    // Pink for street parking
+        'university': 'rgba(34, 197, 94, 0.4)', // Green for universities (cheap)
+        'hospital': 'rgba(251, 146, 60, 0.4)',  // Orange for hospitals
+        'attraction': 'rgba(168, 85, 247, 0.4)' // Purple for attractions
+      };
+
+      // Add parking location markers and polygons
       PARKING_LOCATIONS.forEach((location) => {
+        // Add polygon (rectangle) around parking area
+        const latOffset = 0.01;
+        const lngOffset = 0.015;
+        
+        const polygon = L.rectangle([
+          [location.lat - latOffset, location.lng - lngOffset],
+          [location.lat + latOffset, location.lng + lngOffset]
+        ], {
+          color: typeColors[location.type] || 'rgba(100, 100, 100, 0.4)',
+          fillColor: typeColors[location.type] || 'rgba(100, 100, 100, 0.3)',
+          fillOpacity: 0.6,
+          weight: 2
+        })
+          .bindPopup(`
+            <strong>${location.name}</strong><br>
+            Type: ${location.type}<br>
+            Available: ${location.available}/${location.total}<br>
+            Price: ${location.price}<br>
+            Rating: ${location.rating}⭐
+          `)
+          .addTo(mapInstance.current);
+
+        // Add marker on top of polygon
         const greenIcon = new L.Icon({
           iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png',
           shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
@@ -67,6 +101,24 @@ const CityMapPage: React.FC<CityMapPageProps> = ({ city, onBack }) => {
     };
   }, [city]);
 
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!searchQuery.trim()) return;
+    
+    const location = PARKING_LOCATIONS.find(loc => 
+      loc.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    
+    if (location && mapInstance.current) {
+      mapInstance.current.setView([location.lat, location.lng], 15);
+      
+      // Temporarily add a pulsing animation
+      mapInstance.current.flyTo([location.lat, location.lng], 16, {
+        duration: 0.5
+      });
+    }
+  };
+
   const quickChips = ['Home', 'Work', 'Shopping'];
 
   return (
@@ -90,13 +142,17 @@ const CityMapPage: React.FC<CityMapPageProps> = ({ city, onBack }) => {
           background: 'white', borderRadius: 16, border: '1px solid #E5E7EB',
           padding: 12, boxShadow: '0 10px 30px rgba(0,0,0,0.15)'
         }}>
-          <input
-            placeholder="Where do you want to park?"
-            style={{
-              width: '100%', padding: '14px 16px', border: '2px solid #E5E7EB',
-              borderRadius: 12, fontSize: 16
-            }}
-          />
+          <form onSubmit={handleSearch}>
+            <input
+              placeholder="Search parking location (e.g. Oliwa, Forum)..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={{
+                width: '100%', padding: '14px 16px', border: '2px solid #E5E7EB',
+                borderRadius: 12, fontSize: 16
+              }}
+            />
+          </form>
 
           <div style={{ display: 'flex', gap: 12, marginTop: 12 }}>
             {quickChips.map(label => (
@@ -107,6 +163,13 @@ const CityMapPage: React.FC<CityMapPageProps> = ({ city, onBack }) => {
                 {label}
               </button>
             ))}
+          </div>
+
+          <div style={{ marginTop: 12, fontSize: 12, color: '#666' }}>
+            <strong>Parking Types:</strong> 
+            <span style={{ margin: '0 8px' }}><span style={{ color: '#3B82F6' }}>Blue</span> = Mall</span>
+            <span style={{ margin: '0 8px' }}><span style={{ color: '#EF4444' }}>Red</span> = Office</span>
+            <span style={{ margin: '0 8px' }}><span style={{ color: '#22C55E' }}>Green</span> = University (Cheap)</span>
           </div>
         </div>
       </div>
