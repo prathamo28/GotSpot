@@ -18,6 +18,7 @@ const CityMapPage: React.FC<CityMapPageProps> = ({ city, onBack }) => {
   const mapRef = useRef<HTMLDivElement | null>(null);
   const mapInstance = useRef<any>(null);
   const [searchQuery, setSearchQuery] = React.useState('');
+  const [showList, setShowList] = React.useState(true); // Mobile-first: show list by default
 
   useEffect(() => {
     let isMounted = true;
@@ -37,34 +38,10 @@ const CityMapPage: React.FC<CityMapPageProps> = ({ city, onBack }) => {
       // Add city center marker
       L.marker([cityInfo.lat, cityInfo.lng]).addTo(mapInstance.current);
 
-      // Color mapping based on BUSY LEVEL (not type)
-      const busyColors: Record<string, string> = {
-        'busy': 'rgba(239, 68, 68, 0.5)',     // RED - Very busy (Oliwa office area)
-        'moderate': 'rgba(251, 146, 60, 0.5)', // ORANGE - Moderate
-        'free': 'rgba(34, 197, 94, 0.5)'       // GREEN - Mostly free (Metropolia area)
-      };
+      // Just setup markers - no circles
 
-      // Add parking location markers with circular areas
+      // Add parking location markers WITHOUT circles
       PARKING_LOCATIONS.forEach((location) => {
-        // Add small circle around parking spot (better for mobile)
-        // Color based on BUSY LEVEL
-        const fillColor = busyColors[location.busyLevel] || 'rgba(100, 100, 100, 0.3)';
-        const circle = L.circle([location.lat, location.lng], {
-          radius: 300,
-          color: fillColor,
-          fillColor: fillColor,
-          fillOpacity: 0.4,
-          weight: 2
-        })
-          .bindPopup(`
-            <strong>${location.name}</strong><br>
-            Type: ${location.type}<br>
-            Available: ${location.available}/${location.total}<br>
-            Price: ${location.price}<br>
-            Rating: ${location.rating}⭐
-          `)
-          .addTo(mapInstance.current);
-
         // Add colorful marker based on BUSY LEVEL
         const markerColor = location.busyLevel === 'busy' ? 'red' : 
                            location.busyLevel === 'moderate' ? 'orange' : 'green';
@@ -73,8 +50,8 @@ const CityMapPage: React.FC<CityMapPageProps> = ({ city, onBack }) => {
         const icon = new L.Icon({
           iconUrl: iconUrl,
           shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-          iconSize: [25, 41],
-          iconAnchor: [12, 41],
+          iconSize: [30, 46],
+          iconAnchor: [15, 46],
           popupAnchor: [1, -34],
           shadowSize: [41, 41]
         });
@@ -115,69 +92,182 @@ const CityMapPage: React.FC<CityMapPageProps> = ({ city, onBack }) => {
     }
   };
 
-  const quickChips = ['Home', 'Work', 'Shopping'];
+  const filteredLocations = PARKING_LOCATIONS.filter(loc => 
+    loc.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const getStatusColor = (level: string) => {
+    return level === 'busy' ? '#EF4444' : level === 'moderate' ? '#F99160' : '#22C55E';
+  };
 
   return (
-    <div style={{ width: '100%', height: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <div style={{ position: 'relative', flex: 1 }}>
-        <div ref={mapRef} style={{ position: 'absolute', inset: 0 }} />
-
+    <div style={{ width: '100%', height: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: '#F9FAFB' }}>
+      {/* Mobile Header */}
+      <div style={{ 
+        background: 'white', 
+        padding: '12px 16px',
+        borderBottom: '1px solid #E5E7EB',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 12
+      }}>
         <button
           onClick={onBack}
           style={{
-            position: 'absolute', top: 16, left: 16, zIndex: 1000,
-            background: 'white', border: '1px solid #E5E7EB', borderRadius: 12,
-            padding: '10px 12px', fontWeight: 700, cursor: 'pointer'
+            background: 'none',
+            border: 'none',
+            fontSize: 24,
+            cursor: 'pointer',
+            padding: '4px 8px'
           }}
         >
-          ← Back
+          ←
         </button>
+        <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>Parking in {city}</h2>
+      </div>
 
-        <div style={{
-          position: 'absolute', left: 16, right: 16, bottom: 90, zIndex: 1000,
-          background: 'white', borderRadius: 16, border: '1px solid #E5E7EB',
-          padding: 12, boxShadow: '0 10px 30px rgba(0,0,0,0.15)'
-        }}>
-          <form onSubmit={handleSearch} style={{ display: 'flex', gap: 8 }}>
-            <input
-              placeholder="Try: Olivia, Forum, Zoo, University..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+      {/* Toggle Buttons */}
+      <div style={{ 
+        background: 'white', 
+        padding: '8px 16px',
+        display: 'flex',
+        gap: 8,
+        borderBottom: '1px solid #E5E7EB'
+      }}>
+        <button
+          onClick={() => setShowList(true)}
+          style={{
+            flex: 1,
+            padding: '8px',
+            border: 'none',
+            borderRadius: 8,
+            background: showList ? '#3B82F6' : '#F3F4F6',
+            color: showList ? 'white' : '#6B7280',
+            fontWeight: 600,
+            cursor: 'pointer'
+          }}
+        >
+          📋 List
+        </button>
+        <button
+          onClick={() => setShowList(false)}
+          style={{
+            flex: 1,
+            padding: '8px',
+            border: 'none',
+            borderRadius: 8,
+            background: !showList ? '#3B82F6' : '#F3F4F6',
+            color: !showList ? 'white' : '#6B7280',
+            fontWeight: 600,
+            cursor: 'pointer'
+          }}
+        >
+          🗺️ Map
+        </button>
+      </div>
+
+      {showList ? (
+        // MOBILE-FIRST LIST VIEW
+        <div style={{ flex: 1, overflowY: 'auto', padding: 16 }}>
+          {filteredLocations.map((location) => (
+            <div
+              key={location.id}
               style={{
-                flex: 1, padding: '14px 16px', border: '2px solid #E5E7EB',
-                borderRadius: 12, fontSize: 16
-              }}
-            />
-            <button
-              type="submit"
-              style={{
-                padding: '14px 24px', background: '#3B82F6', color: 'white',
-                border: 'none', borderRadius: 12, fontWeight: 600, cursor: 'pointer'
+                background: 'white',
+                borderRadius: 12,
+                padding: 16,
+                marginBottom: 12,
+                boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                borderLeft: `4px solid ${getStatusColor(location.busyLevel)}`
               }}
             >
-              Search
-            </button>
-          </form>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
+                <div style={{ flex: 1 }}>
+                  <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: '#111827' }}>
+                    {location.name}
+                  </h3>
+                  <p style={{ margin: '4px 0', fontSize: 14, color: '#6B7280' }}>
+                    {location.type} • {location.price}
+                  </p>
+                </div>
+                <div style={{
+                  background: getStatusColor(location.busyLevel),
+                  color: 'white',
+                  padding: '4px 12px',
+                  borderRadius: 20,
+                  fontSize: 12,
+                  fontWeight: 700
+                }}>
+                  {location.available}/{location.total}
+                </div>
+              </div>
+              <div style={{ marginTop: 8, display: 'flex', gap: 4 }}>
+                {location.features.slice(0, 3).map((feature, idx) => (
+                  <span
+                    key={idx}
+                    style={{
+                      background: '#F3F4F6',
+                      padding: '2px 8px',
+                      borderRadius: 12,
+                      fontSize: 11,
+                      color: '#6B7280'
+                    }}
+                  >
+                    {feature}
+                  </span>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        // MAP VIEW
+        <div style={{ position: 'relative', flex: 1 }}>
+          <div ref={mapRef} style={{ position: 'absolute', inset: 0 }} />
 
-          <div style={{ display: 'flex', gap: 12, marginTop: 12 }}>
-            {quickChips.map(label => (
-              <button key={label} style={{
-                padding: '10px 14px', borderRadius: 12, border: '1px solid #E5E7EB',
-                background: '#FFF', fontWeight: 700, cursor: 'pointer'
-              }}>
-                {label}
+          {/* Map Search */}
+          <div style={{
+            position: 'absolute', 
+            left: 16, right: 16, 
+            top: 16, 
+            zIndex: 1000,
+            background: 'white', 
+            borderRadius: 12, 
+            padding: 8,
+            boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
+          }}>
+            <form onSubmit={handleSearch} style={{ display: 'flex', gap: 8 }}>
+              <input
+                placeholder="Search..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                style={{
+                  flex: 1, 
+                  padding: '10px 12px', 
+                  border: '1px solid #E5E7EB',
+                  borderRadius: 8, 
+                  fontSize: 14,
+                  outline: 'none'
+                }}
+              />
+              <button
+                type="submit"
+                style={{
+                  padding: '10px 20px', 
+                  background: '#3B82F6', 
+                  color: 'white',
+                  border: 'none', 
+                  borderRadius: 8, 
+                  fontWeight: 600, 
+                  cursor: 'pointer'
+                }}
+              >
+                🔍
               </button>
-            ))}
-          </div>
-
-          <div style={{ marginTop: 12, fontSize: 12, color: '#666' }}>
-            <strong>Parking Availability:</strong> 
-            <span style={{ margin: '0 8px' }}><span style={{ color: '#EF4444' }}>🔴 Red</span> = Very Busy (Oliwa)</span>
-            <span style={{ margin: '0 8px' }}><span style={{ color: '#F99160' }}>🟠 Orange</span> = Moderate</span>
-            <span style={{ margin: '0 8px' }}><span style={{ color: '#22C55E' }}>🟢 Green</span> = Free (Metropolia)</span>
+            </form>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
