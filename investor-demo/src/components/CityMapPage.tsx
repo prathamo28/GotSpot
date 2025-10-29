@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { POLISH_CITIES } from '../data/cities.ts';
+import { PARKING_LOCATIONS } from '../data/parkingLocations.ts';
 
 interface CityMapPageProps {
   city: string;
@@ -32,7 +33,30 @@ const CityMapPage: React.FC<CityMapPageProps> = ({ city, onBack }) => {
         attribution: '&copy; OpenStreetMap contributors'
       }).addTo(mapInstance.current);
 
+      // Add city center marker
       L.marker([cityInfo.lat, cityInfo.lng]).addTo(mapInstance.current);
+
+      // Add parking location markers
+      PARKING_LOCATIONS.forEach((location) => {
+        const greenIcon = new L.Icon({
+          iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png',
+          shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+          iconSize: [25, 41],
+          iconAnchor: [12, 41],
+          popupAnchor: [1, -34],
+          shadowSize: [41, 41]
+        });
+
+        const marker = L.marker([location.lat, location.lng], { icon: greenIcon })
+          .bindPopup(`
+            <strong>${location.name}</strong><br>
+            Type: ${location.type}<br>
+            Available: ${location.available}/${location.total}<br>
+            Price: ${location.price}<br>
+            Rating: ${location.rating}⭐
+          `)
+          .addTo(mapInstance.current);
+      });
     })();
     return () => {
       isMounted = false;
