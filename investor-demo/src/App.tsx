@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import './App.css';
-import LoginForm from './components/LoginForm';
-import CitySelect from './components/CitySelect';
-import CityMapPage from './components/CityMapPage';
+import LoginForm from './components/LoginForm.tsx';
+import CitySelect from './components/CitySelect.tsx';
+import CityMapPage from './components/CityMapPage.tsx';
 
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
