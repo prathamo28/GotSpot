@@ -21,6 +21,9 @@ const CityMapPage: React.FC<CityMapPageProps> = ({ city, onBack }) => {
   const [showList, setShowList] = React.useState(true); // Mobile-first: show list by default
 
   useEffect(() => {
+    // Only initialize map when NOT showing list
+    if (showList) return;
+    
     let isMounted = true;
     (async () => {
       const cityInfo = POLISH_CITIES[city];
@@ -29,43 +32,44 @@ const CityMapPage: React.FC<CityMapPageProps> = ({ city, onBack }) => {
 
       if (!isMounted) return;
 
-      mapInstance.current = L.map(mapRef.current).setView([cityInfo.lat, cityInfo.lng], 12);
+      // Initialize map if not already initialized
+      if (!mapInstance.current) {
+        mapInstance.current = L.map(mapRef.current).setView([cityInfo.lat, cityInfo.lng], 12);
 
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap contributors'
-      }).addTo(mapInstance.current);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(mapInstance.current);
 
-      // Add city center marker
-      L.marker([cityInfo.lat, cityInfo.lng]).addTo(mapInstance.current);
+        // Add city center marker
+        L.marker([cityInfo.lat, cityInfo.lng]).addTo(mapInstance.current);
 
-      // Just setup markers - no circles
+        // Add parking location markers WITHOUT circles
+        PARKING_LOCATIONS.forEach((location) => {
+          // Add colorful marker based on BUSY LEVEL
+          const markerColor = location.busyLevel === 'busy' ? 'red' : 
+                             location.busyLevel === 'moderate' ? 'orange' : 'green';
+          const iconUrl = `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${markerColor}.png`;
+          
+          const icon = new L.Icon({
+            iconUrl: iconUrl,
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+            iconSize: [30, 46],
+            iconAnchor: [15, 46],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+          });
 
-      // Add parking location markers WITHOUT circles
-      PARKING_LOCATIONS.forEach((location) => {
-        // Add colorful marker based on BUSY LEVEL
-        const markerColor = location.busyLevel === 'busy' ? 'red' : 
-                           location.busyLevel === 'moderate' ? 'orange' : 'green';
-        const iconUrl = `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${markerColor}.png`;
-        
-        const icon = new L.Icon({
-          iconUrl: iconUrl,
-          shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-          iconSize: [30, 46],
-          iconAnchor: [15, 46],
-          popupAnchor: [1, -34],
-          shadowSize: [41, 41]
+          const marker = L.marker([location.lat, location.lng], { icon })
+            .bindPopup(`
+              <strong>${location.name}</strong><br>
+              Type: ${location.type}<br>
+              Available: ${location.available}/${location.total}<br>
+              Price: ${location.price}<br>
+              Rating: ${location.rating}⭐
+            `)
+            .addTo(mapInstance.current);
         });
-
-        const marker = L.marker([location.lat, location.lng], { icon })
-          .bindPopup(`
-            <strong>${location.name}</strong><br>
-            Type: ${location.type}<br>
-            Available: ${location.available}/${location.total}<br>
-            Price: ${location.price}<br>
-            Rating: ${location.rating}⭐
-          `)
-          .addTo(mapInstance.current);
-      });
+      }
     })();
     return () => {
       isMounted = false;
@@ -74,7 +78,7 @@ const CityMapPage: React.FC<CityMapPageProps> = ({ city, onBack }) => {
         mapInstance.current = null;
       }
     };
-  }, [city]);
+  }, [city, showList]); // Add showList to dependencies
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
