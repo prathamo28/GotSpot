@@ -1,93 +1,61 @@
-# 🚗 GotSpot - Smart Parking Solution
+# GotSpot — Smart Parking for Poland
 
-Smart parking solution for Poland built with React, TypeScript, and Google Cloud.
+Real-time parking finder for 20 major Polish cities. Built with React + TypeScript, Leaflet maps, and GCP infrastructure.
 
----
-
-## 📁 Project Structure
-
-```
-GotSpot/
-├── investor-demo/         # Investor demo app
-│   ├── src/               # React components
-│   ├── DEPLOYMENT_GUIDE.md # Deploy to Vercel
-│   └── README.md          # Demo info
-├── terraform/             # Infrastructure as Code
-│   ├── main.tf            # GCP resources
-│   └── variables.tf       # Configuration
-├── src/                   # Main React app
-├── .github/workflows/     # CI/CD pipelines
-└── DEPLOYMENT_GUIDE.md    # Deployment instructions
-```
+> **Status:** Working demo. Prototype for validation and investment — real parking data integration is the next milestone.
 
 ---
 
-## 🚀 Quick Start
+## Features
 
-### Development
+- City selection across 20 major Polish cities
+- Interactive Leaflet map per city
+- Mobile-optimised UI
+- GCP Cloud Storage + CDN hosting via Terraform
+- CI/CD via GitHub Actions
+
+---
+
+## Quick Start
+
 ```bash
 npm install
 npm start
 ```
 
-### Build
-```bash
-npm run build
+Copy `.env.example` to `.env` and fill in your values before running.
+
+---
+
+## Deploy to GCP
+
+See `DEPLOYMENT_GUIDE.md` for full Terraform + GCP setup.
+
+Required GitHub secrets:
+- `GCP_PROJECT_ID`
+- `GCP_SA_KEY`
+
+---
+
+## Investor Demo
+
+A standalone investor demo app lives in `investor-demo/`. Deploy it separately to Vercel — see `investor-demo/DEPLOYMENT_GUIDE.md`.
+
+---
+
+## Project Structure
+
+```
+GotSpot/
+├── src/                  # Main React app
+├── investor-demo/        # Standalone investor demo
+├── terraform/            # GCP infrastructure as code
+├── .github/workflows/    # CI/CD pipelines
+└── scripts/              # Terraform backend setup
 ```
 
-### Deploy Investor Demo
-See `investor-demo/DEPLOYMENT_GUIDE.md`
-
-### Deploy Infrastructure
-See `DEPLOYMENT_GUIDE.md`
-
 ---
 
-## 📱 Features
+## License
 
-- Smart parking search
-- Real-time availability
-- Interactive maps
-- Mobile-optimized
-- 20 Polish cities
-
----
-
-## 🎯 Investor Demo
-
-Deploy to Vercel: `investor-demo/DEPLOYMENT_GUIDE.md`
-
-**Live Demo**: See deployment guide  
-**Login**: `demo@gotspot.com`  
-**Password**: `gotspot2025`
-
----
-
-## 💼 Investor Materials
-
-See `investor-demo/` folder:
-- Investor presentation
-- Fundraising guide
-- Business plan
-
----
-
-## 🚀 Deployment
-
-### Investor Demo
-- Deploy to Vercel (see `investor-demo/DEPLOYMENT_GUIDE.md`)
-- Free hosting with auto-deploy
-
-### Infrastructure
-- Deploy with Terraform (see `DEPLOYMENT_GUIDE.md`)
-- Google Cloud Platform
-
----
-
-## 📄 License
-
-Proprietary - All rights reserved
-
----
-
-**Built with ❤️ in Poland**
+Proprietary — All rights reserved

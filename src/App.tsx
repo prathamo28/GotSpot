@@ -4,19 +4,22 @@ import LoginForm from './components/LoginForm';
 import CitySelect from './components/CitySelect';
 import CityMapPage from './components/CityMapPage';
 
+const DEMO_EMAIL = process.env.REACT_APP_DEMO_EMAIL || 'demo@gotspot.com';
+const DEMO_PASSWORD = process.env.REACT_APP_DEMO_PASSWORD || 'gotspot2025';
+
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loginError, setLoginError] = useState('');
   const [city, setCity] = useState<string | null>(null);
-  const [page, setPage] = useState<'login' | 'city' | 'map'>("login");
+  const [page, setPage] = useState<'login' | 'city' | 'map'>('login');
 
   const handleLogin = (email: string, password: string) => {
-    if (email === 'demo@gotspot.com' && password === 'gotspot2025') {
+    if (email === DEMO_EMAIL && password === DEMO_PASSWORD) {
       setIsAuthenticated(true);
       setLoginError('');
       setPage('city');
     } else {
-      setLoginError('Invalid email or password. Use demo@gotspot.com / gotspot2025');
+      setLoginError('Invalid credentials. Use the demo account shown below.');
     }
   };
 
@@ -30,6 +33,7 @@ const App: React.FC = () => {
   if (!isAuthenticated || page === 'login') {
     return (
       <div className="app">
+        <div className="demo-banner">🚧 DEMO MODE — No real parking data</div>
         <LoginForm onLogin={handleLogin} error={loginError} />
       </div>
     );
@@ -38,6 +42,7 @@ const App: React.FC = () => {
   if (page === 'city') {
     return (
       <div className="app">
+        <div className="demo-banner">🚧 DEMO MODE — No real parking data</div>
         <CitySelect onSelect={(c) => { setCity(c); setPage('map'); }} />
       </div>
     );
@@ -52,9 +57,7 @@ const App: React.FC = () => {
       <div className="welcome-container">
         <h1>Welcome to GotSpot! 🚗</h1>
         <p>Selected city: <strong>{city ?? '—'}</strong></p>
-        <button onClick={handleLogout} className="logout-btn">
-          Logout
-        </button>
+        <button onClick={handleLogout} className="logout-btn">Logout</button>
       </div>
     </div>
   );
